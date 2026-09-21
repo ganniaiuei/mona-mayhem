@@ -345,6 +345,12 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				line-height: 1.7;
 			}
 
+			.graph-summary {
+				color: var(--muted);
+				font-size: 0.58rem;
+				line-height: 1.7;
+			}
+
 			.sr-only {
 				position: absolute;
 				width: 1px;
@@ -445,6 +451,10 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 					</div>
 
 					<div class="graph" aria-hidden="true" set:html={playerOneGraph}></div>
+					<p class="graph-summary">
+						Preview grid shows a two-week contribution snapshot with brighter cells
+						representing more activity.
+					</p>
 
 					<div class="stats">
 						<div class="stat-row">
@@ -468,6 +478,10 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 					</div>
 
 					<div class="graph" aria-hidden="true" set:html={playerTwoGraph}></div>
+					<p class="graph-summary">
+						Preview grid shows a two-week contribution snapshot with brighter cells
+						representing more activity.
+					</p>
 
 					<div class="stats">
 						<div class="stat-row">
