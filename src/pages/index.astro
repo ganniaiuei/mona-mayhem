@@ -434,7 +434,7 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				</div>
 			</section>
 
-			<section class="controls" aria-label="Battle setup">
+			<form id="battle-setup" class="controls" aria-label="Battle setup">
 				<div>
 					<label for="player-one">Player 1</label>
 					<input id="player-one" class="field" type="text" value="octocat" />
@@ -443,8 +443,8 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 					<label for="player-two">Player 2</label>
 					<input id="player-two" class="field" type="text" value="monalisa" />
 				</div>
-				<button class="battle-button" type="button">Start Battle</button>
-			</section>
+				<button class="battle-button" type="submit">Start Battle</button>
+			</form>
 
 			<section class="battle-grid" aria-label="Battle preview">
 				<article
@@ -530,6 +530,7 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 
 		<script is:inline>
 			const root = document.documentElement;
+			const battleSetup = document.getElementById('battle-setup');
 			const toggle = document.getElementById('theme-toggle');
 			const toggleText = document.getElementById('theme-toggle-text');
 			const announcer = document.getElementById('theme-announcer');
@@ -559,6 +560,10 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 			}
 
 			syncThemeToggle();
+
+			battleSetup?.addEventListener('submit', (event) => {
+				event.preventDefault();
+			});
 
 			toggle?.addEventListener('click', () => {
 				const isVoltage = root.getAttribute('data-battle-theme') === 'voltage';
