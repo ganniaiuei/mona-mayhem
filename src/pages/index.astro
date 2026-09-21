@@ -444,7 +444,6 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				<article
 					class="player-card"
 					aria-labelledby="player-one-name"
-					aria-describedby="player-one-graph-summary"
 				>
 					<div class="card-head">
 						<div>
@@ -454,7 +453,13 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						<div class="vs-badge" aria-hidden="true">P1</div>
 					</div>
 
-					<div class="graph" aria-hidden="true" set:html={playerOneGraph}></div>
+					<div
+						class="graph"
+						role="img"
+						aria-label="Player 1 contribution preview"
+						aria-describedby="player-one-graph-summary"
+						set:html={playerOneGraph}
+					></div>
 					<p id="player-one-graph-summary" class="graph-summary">
 						Preview grid shows a two-week contribution snapshot with brighter cells
 						representing more activity.
@@ -475,7 +480,6 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				<article
 					class="player-card"
 					aria-labelledby="player-two-name"
-					aria-describedby="player-two-graph-summary"
 				>
 					<div class="card-head">
 						<div>
@@ -485,7 +489,13 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						<div class="vs-badge" aria-hidden="true">P2</div>
 					</div>
 
-					<div class="graph" aria-hidden="true" set:html={playerTwoGraph}></div>
+					<div
+						class="graph"
+						role="img"
+						aria-label="Player 2 contribution preview"
+						aria-describedby="player-two-graph-summary"
+						set:html={playerTwoGraph}
+					></div>
 					<p id="player-two-graph-summary" class="graph-summary">
 						Preview grid shows a two-week contribution snapshot with brighter cells
 						representing more activity.
