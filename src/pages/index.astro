@@ -428,7 +428,8 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						aria-pressed="false"
 						aria-describedby="theme-note"
 					>
-						ALT THEME: OFF
+						<span class="sr-only">Toggle alternate theme</span>
+						<span id="theme-toggle-text" aria-hidden="true">ALT THEME: OFF</span>
 					</button>
 				</div>
 			</section>
@@ -529,6 +530,7 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 		<script is:inline>
 			const root = document.documentElement;
 			const toggle = document.getElementById('theme-toggle');
+			const toggleText = document.getElementById('theme-toggle-text');
 			const announcer = document.getElementById('theme-announcer');
 
 			function persistThemePreference(isVoltage) {
@@ -545,7 +547,9 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				if (!(toggle instanceof HTMLButtonElement)) return;
 				const isVoltage = root.getAttribute('data-battle-theme') === 'voltage';
 				toggle.setAttribute('aria-pressed', String(isVoltage));
-				toggle.textContent = isVoltage ? 'ALT THEME: ON' : 'ALT THEME: OFF';
+				if (toggleText) {
+					toggleText.textContent = isVoltage ? 'ALT THEME: ON' : 'ALT THEME: OFF';
+				}
 				if (announce && announcer) {
 					announcer.textContent = isVoltage
 						? 'Blue and orange battle theme enabled.'
