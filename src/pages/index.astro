@@ -19,9 +19,27 @@ const sampleDays = [
 const safeHexColor = (value: string) =>
 	/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value) ? value : '#16162b';
 
+const getActivityLabel = (value: string) => {
+	switch (safeHexColor(value).toLowerCase()) {
+		case '#39d353':
+			return 'high activity';
+		case '#26a641':
+			return 'medium activity';
+		case '#006d32':
+			return 'light activity';
+		case '#0e4429':
+			return 'minimal activity';
+		default:
+			return 'no activity';
+	}
+};
+
 const renderDayCells = (days: string[]) =>
 	days
-		.map((dayColor) => `<span class="day" style="--day-color: ${safeHexColor(dayColor)};"></span>`)
+		.map(
+			(dayColor, index) =>
+				`<li class="day" style="--day-color: ${safeHexColor(dayColor)};" aria-label="Preview day ${index + 1}, ${getActivityLabel(dayColor)}"></li>`
+		)
 		.join('');
 
 const playerOneGraph = renderDayCells(sampleDays);
@@ -312,6 +330,7 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				gap: 0.45rem;
 				padding: 1rem;
 				margin: 1rem 0;
+				list-style: none;
 				border: 1px solid var(--grid-frame);
 				background: rgba(3, 6, 19, 0.85);
 			}
@@ -420,6 +439,7 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						id="theme-toggle"
 						class="theme-toggle"
 						type="button"
+						aria-label="Toggle battle color theme"
 						aria-pressed="false"
 						aria-describedby="theme-note"
 					>
@@ -453,13 +473,12 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						<div class="vs-badge" aria-hidden="true">P1</div>
 					</div>
 
-					<div
+					<ul
 						class="graph"
-						role="img"
-						aria-label="Player 1 contribution preview"
+						aria-label="Player 1 sample contribution preview"
 						aria-describedby="player-one-graph-summary"
 						set:html={playerOneGraph}
-					></div>
+					></ul>
 					<p id="player-one-graph-summary" class="graph-summary">
 						Preview grid shows a two-week contribution snapshot with brighter cells
 						representing more activity.
@@ -489,13 +508,12 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						<div class="vs-badge" aria-hidden="true">P2</div>
 					</div>
 
-					<div
+					<ul
 						class="graph"
-						role="img"
-						aria-label="Player 2 contribution preview"
+						aria-label="Player 2 sample contribution preview"
 						aria-describedby="player-two-graph-summary"
 						set:html={playerTwoGraph}
-					></div>
+					></ul>
 					<p id="player-two-graph-summary" class="graph-summary">
 						Preview grid shows a two-week contribution snapshot with brighter cells
 						representing more activity.
