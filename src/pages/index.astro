@@ -441,11 +441,15 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 			</section>
 
 			<section class="battle-grid" aria-label="Battle preview">
-				<article class="player-card" aria-describedby="player-one-graph-summary">
+				<article
+					class="player-card"
+					aria-labelledby="player-one-name"
+					aria-describedby="player-one-graph-summary"
+				>
 					<div class="card-head">
 						<div>
 							<span class="player-label">Player 1</span>
-							<h2 class="username">@octocat</h2>
+							<h2 id="player-one-name" class="username">@octocat</h2>
 						</div>
 						<div class="vs-badge" aria-hidden="true">P1</div>
 					</div>
@@ -468,11 +472,15 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 					</div>
 				</article>
 
-				<article class="player-card" aria-describedby="player-two-graph-summary">
+				<article
+					class="player-card"
+					aria-labelledby="player-two-name"
+					aria-describedby="player-two-graph-summary"
+				>
 					<div class="card-head">
 						<div>
 							<span class="player-label">Player 2</span>
-							<h2 class="username">@monalisa</h2>
+							<h2 id="player-two-name" class="username">@monalisa</h2>
 						</div>
 						<div class="vs-badge" aria-hidden="true">P2</div>
 					</div>
