@@ -480,7 +480,8 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 					<div
 						class="graph"
 						role="group"
-						aria-labelledby="player-one-graph-summary"
+						aria-label="Player 1 contribution preview"
+						aria-describedby="player-one-graph-summary"
 						set:html={playerOneGraph}
 					></div>
 					<p id="player-one-graph-summary" class="graph-summary">
@@ -515,7 +516,8 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 					<div
 						class="graph"
 						role="group"
-						aria-labelledby="player-two-graph-summary"
+						aria-label="Player 2 contribution preview"
+						aria-describedby="player-two-graph-summary"
 						set:html={playerTwoGraph}
 					></div>
 					<p id="player-two-graph-summary" class="graph-summary">
