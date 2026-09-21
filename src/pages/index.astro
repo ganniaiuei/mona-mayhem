@@ -307,6 +307,7 @@ const sampleDays = [
 				aspect-ratio: 1;
 				border: 1px solid rgba(255, 255, 255, 0.08);
 				background: var(--day-color);
+				box-shadow: 0 0 12px rgba(57, 211, 83, 0.25);
 				box-shadow: 0 0 12px color-mix(in srgb, var(--day-color) 45%, transparent);
 			}
 
@@ -492,6 +493,16 @@ const sampleDays = [
 			const toggle = document.getElementById('theme-toggle');
 			const announcer = document.getElementById('theme-announcer');
 
+			function persistThemePreference(isVoltage) {
+				try {
+					if (isVoltage) {
+						localStorage.setItem('battle-theme', 'voltage');
+					} else {
+						localStorage.removeItem('battle-theme');
+					}
+				} catch {}
+			}
+
 			function syncThemeToggle() {
 				if (!(toggle instanceof HTMLButtonElement)) return;
 				const isVoltage = root.getAttribute('data-battle-theme') === 'voltage';
@@ -510,11 +521,10 @@ const sampleDays = [
 				const isVoltage = root.getAttribute('data-battle-theme') === 'voltage';
 				if (isVoltage) {
 					root.removeAttribute('data-battle-theme');
-					localStorage.removeItem('battle-theme');
 				} else {
 					root.setAttribute('data-battle-theme', 'voltage');
-					localStorage.setItem('battle-theme', 'voltage');
 				}
+				persistThemePreference(!isVoltage);
 				syncThemeToggle();
 			});
 		</script>
