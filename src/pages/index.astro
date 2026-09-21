@@ -38,7 +38,7 @@ const renderDayCells = (days: string[]) =>
 	days
 		.map(
 			(dayColor, index) =>
-				`<li class="day" style="--day-color: ${safeHexColor(dayColor)};" aria-label="Preview day ${index + 1}, ${getActivityLabel(dayColor)}"></li>`
+				`<span class="day" style="--day-color: ${safeHexColor(dayColor)};" aria-hidden="true" title="Preview day ${index + 1}, ${getActivityLabel(dayColor)}"></span>`
 		)
 		.join('');
 
@@ -330,7 +330,6 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				gap: 0.45rem;
 				padding: 1rem;
 				margin: 1rem 0;
-				list-style: none;
 				border: 1px solid var(--grid-frame);
 				background: rgba(3, 6, 19, 0.85);
 			}
@@ -478,12 +477,12 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						<div class="vs-badge" aria-hidden="true">P1</div>
 					</div>
 
-					<ul
+					<div
 						class="graph"
-						aria-label="Player 1 sample contribution preview"
-						aria-describedby="player-one-graph-summary"
+						role="group"
+						aria-labelledby="player-one-graph-summary"
 						set:html={playerOneGraph}
-					></ul>
+					></div>
 					<p id="player-one-graph-summary" class="graph-summary">
 						Preview grid shows a two-week contribution snapshot with brighter cells
 						representing more activity.
@@ -513,12 +512,12 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						<div class="vs-badge" aria-hidden="true">P2</div>
 					</div>
 
-					<ul
+					<div
 						class="graph"
-						aria-label="Player 2 sample contribution preview"
-						aria-describedby="player-two-graph-summary"
+						role="group"
+						aria-labelledby="player-two-graph-summary"
 						set:html={playerTwoGraph}
-					></ul>
+					></div>
 					<p id="player-two-graph-summary" class="graph-summary">
 						Preview grid shows a two-week contribution snapshot with brighter cells
 						representing more activity.
