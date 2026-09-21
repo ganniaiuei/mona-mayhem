@@ -15,6 +15,14 @@ const sampleDays = [
 	'#0e4429',
 	'#26a641',
 ];
+
+const renderDayCells = (days: string[]) =>
+	days
+		.map((dayColor) => `<span class="day" style="--day-color: ${dayColor};"></span>`)
+		.join('');
+
+const playerOneGraph = renderDayCells(sampleDays);
+const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 ---
 
 <html lang="en">
@@ -433,13 +441,7 @@ const sampleDays = [
 						<div class="vs-badge" aria-hidden="true">P1</div>
 					</div>
 
-					<div class="graph" aria-hidden="true">
-						{
-							sampleDays.map((dayColor) => (
-								<span class="day" style={`--day-color: ${dayColor};`}></span>
-							))
-						}
-					</div>
+					<div class="graph" aria-hidden="true" set:html={playerOneGraph}></div>
 
 					<div class="stats">
 						<div class="stat-row">
@@ -462,13 +464,7 @@ const sampleDays = [
 						<div class="vs-badge" aria-hidden="true">P2</div>
 					</div>
 
-					<div class="graph" aria-hidden="true">
-						{
-							[...sampleDays].reverse().map((dayColor) => (
-								<span class="day" style={`--day-color: ${dayColor};`}></span>
-							))
-						}
-					</div>
+					<div class="graph" aria-hidden="true" set:html={playerTwoGraph}></div>
 
 					<div class="stats">
 						<div class="stat-row">
