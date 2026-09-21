@@ -435,8 +435,8 @@ const sampleDays = [
 
 					<div class="graph" aria-hidden="true">
 						{
-							sampleDays.map((dayColor) => (
-								<span class="day" style={`--day-color: ${dayColor};`}></span>
+							sampleDays.map((dayColor, index) => (
+								<span key={`player-one-day-${index}`} class="day" style={`--day-color: ${dayColor};`}></span>
 							))
 						}
 					</div>
@@ -464,8 +464,8 @@ const sampleDays = [
 
 					<div class="graph" aria-hidden="true">
 						{
-							[...sampleDays].reverse().map((dayColor) => (
-								<span class="day" style={`--day-color: ${dayColor};`}></span>
+							[...sampleDays].reverse().map((dayColor, index) => (
+								<span key={`player-two-day-${index}`} class="day" style={`--day-color: ${dayColor};`}></span>
 							))
 						}
 					</div>
