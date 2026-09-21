@@ -340,7 +340,12 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 				border: 1px solid rgba(255, 255, 255, 0.08);
 				background: var(--day-color);
 				box-shadow: 0 0 12px rgba(57, 211, 83, 0.25);
-				box-shadow: 0 0 12px color-mix(in srgb, var(--day-color) 45%, transparent);
+			}
+
+			@supports (color: color-mix(in srgb, black 50%, white)) {
+				.day {
+					box-shadow: 0 0 12px color-mix(in srgb, var(--day-color) 45%, transparent);
+				}
 			}
 
 			.stats {
