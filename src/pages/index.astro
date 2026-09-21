@@ -16,9 +16,12 @@ const sampleDays = [
 	'#26a641',
 ];
 
+const safeHexColor = (value: string) =>
+	/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value) ? value : '#16162b';
+
 const renderDayCells = (days: string[]) =>
 	days
-		.map((dayColor) => `<span class="day" style="--day-color: ${dayColor};"></span>`)
+		.map((dayColor) => `<span class="day" style="--day-color: ${safeHexColor(dayColor)};"></span>`)
 		.join('');
 
 const playerOneGraph = renderDayCells(sampleDays);
