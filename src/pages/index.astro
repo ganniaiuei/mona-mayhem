@@ -19,27 +19,9 @@ const sampleDays = [
 const safeHexColor = (value: string) =>
 	/^#(?:[0-9a-fA-F]{3}){1,2}$/.test(value) ? value : '#16162b';
 
-const getActivityLabel = (value: string) => {
-	switch (safeHexColor(value).toLowerCase()) {
-		case '#39d353':
-			return 'high activity';
-		case '#26a641':
-			return 'medium activity';
-		case '#006d32':
-			return 'light activity';
-		case '#0e4429':
-			return 'minimal activity';
-		default:
-			return 'no activity';
-	}
-};
-
 const renderDayCells = (days: string[]) =>
 	days
-		.map(
-			(dayColor, index) =>
-				`<span class="day" style="--day-color: ${safeHexColor(dayColor)};" aria-hidden="true" title="Preview day ${index + 1}, ${getActivityLabel(dayColor)}"></span>`
-		)
+		.map((dayColor) => `<span class="day" style="--day-color: ${safeHexColor(dayColor)};" aria-hidden="true"></span>`)
 		.join('');
 
 const playerOneGraph = renderDayCells(sampleDays);
@@ -443,7 +425,6 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 						id="theme-toggle"
 						class="theme-toggle"
 						type="button"
-						aria-label="Toggle battle color theme"
 						aria-pressed="false"
 						aria-describedby="theme-note"
 					>
