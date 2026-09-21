@@ -1,5 +1,20 @@
 ---
-
+const sampleDays = [
+	'#16162b',
+	'#0e4429',
+	'#006d32',
+	'#26a641',
+	'#39d353',
+	'#16162b',
+	'#26a641',
+	'#39d353',
+	'#0e4429',
+	'#006d32',
+	'#16162b',
+	'#39d353',
+	'#0e4429',
+	'#26a641',
+];
 ---
 
 <html lang="en">
@@ -8,10 +23,500 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
 		<title>Mona Mayhem</title>
+		<script is:inline>
+			const savedTheme = localStorage.getItem('battle-theme');
+			if (savedTheme === 'voltage') {
+				document.documentElement.setAttribute('data-battle-theme', 'voltage');
+			}
+		</script>
+		<style is:global>
+			:root {
+				color-scheme: dark;
+				--bg: #0a0a1a;
+				--bg-panel: rgba(12, 18, 44, 0.86);
+				--text: #f5f7ff;
+				--muted: #b9bfd6;
+				--line: rgba(95, 237, 131, 0.35);
+				--accent-primary: #5fed83;
+				--accent-secondary: #8a2be2;
+				--accent-primary-rgb: 95, 237, 131;
+				--accent-secondary-rgb: 138, 43, 226;
+				--button-text: #081014;
+				--grid-frame: rgba(95, 237, 131, 0.2);
+				--scanline: rgba(255, 255, 255, 0.05);
+				--shadow: 0 0 18px rgba(var(--accent-primary-rgb), 0.32);
+			}
+
+			:root[data-battle-theme='voltage'] {
+				--line: rgba(0, 245, 255, 0.35);
+				--accent-primary: #00f5ff;
+				--accent-secondary: #ff6b35;
+				--accent-primary-rgb: 0, 245, 255;
+				--accent-secondary-rgb: 255, 107, 53;
+				--button-text: #081014;
+				--grid-frame: rgba(0, 245, 255, 0.2);
+				--shadow: 0 0 18px rgba(var(--accent-primary-rgb), 0.38);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family: 'Press Start 2P', system-ui, sans-serif;
+				background:
+					linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+					radial-gradient(circle at top, rgba(var(--accent-secondary-rgb), 0.18), transparent 32%),
+					radial-gradient(circle at bottom, rgba(var(--accent-primary-rgb), 0.15), transparent 28%),
+					var(--bg);
+				background-size: 100% 4px, auto, auto, auto;
+				color: var(--text);
+			}
+
+			body::before {
+				content: '';
+				position: fixed;
+				inset: 0;
+				pointer-events: none;
+				background:
+					linear-gradient(
+						to bottom,
+						transparent 0%,
+						var(--scanline) 50%,
+						transparent 100%
+					);
+				background-size: 100% 6px;
+				opacity: 0.35;
+			}
+
+			.page-shell {
+				position: relative;
+				width: min(1120px, calc(100% - 2rem));
+				margin: 0 auto;
+				padding: 2rem 0 3rem;
+			}
+
+			.top-bar,
+			.controls,
+			.battle-grid,
+			.graph {
+				display: grid;
+			}
+
+			.top-bar {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 1rem;
+				align-items: start;
+				margin-bottom: 1.5rem;
+			}
+
+			.marquee,
+			.player-card {
+				position: relative;
+				background: var(--bg-panel);
+				border: 2px solid var(--line);
+				box-shadow:
+					inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+					var(--shadow);
+				overflow: hidden;
+			}
+
+			.marquee {
+				padding: 1.5rem;
+			}
+
+			.marquee::after,
+			.player-card::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				background: linear-gradient(
+					135deg,
+					transparent 0%,
+					rgba(255, 255, 255, 0.08) 48%,
+					transparent 56%
+				);
+				transform: translateX(-100%);
+				animation: shimmer 5s linear infinite;
+			}
+
+			.status-chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.5rem 0.75rem;
+				margin-bottom: 1rem;
+				border: 2px solid var(--accent-primary);
+				color: var(--accent-primary);
+				text-shadow: 0 0 8px rgba(var(--accent-primary-rgb), 0.75);
+				font-size: 0.68rem;
+			}
+
+			h1,
+			h2,
+			p {
+				margin: 0;
+			}
+
+			h1 {
+				font-size: clamp(1.9rem, 3vw, 3.25rem);
+				line-height: 1.15;
+				text-transform: uppercase;
+				color: var(--accent-primary);
+				text-shadow:
+					0 0 10px rgba(var(--accent-primary-rgb), 0.9),
+					0 0 24px rgba(var(--accent-secondary-rgb), 0.35);
+			}
+
+			.subtitle {
+				margin-top: 1rem;
+				color: var(--muted);
+				line-height: 1.8;
+				font-size: 0.72rem;
+			}
+
+			.theme-switcher {
+				display: flex;
+				justify-content: end;
+			}
+
+			.theme-toggle,
+			.battle-button {
+				border: 2px solid var(--accent-primary);
+				background: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary)
+				);
+				color: var(--button-text);
+				font: inherit;
+				text-transform: uppercase;
+				cursor: pointer;
+				box-shadow: 0 0 16px rgba(var(--accent-primary-rgb), 0.4);
+			}
+
+			.theme-toggle {
+				min-width: 16rem;
+				padding: 1rem;
+			}
+
+			.controls {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 1rem;
+				margin: 1.5rem 0;
+			}
+
+			label,
+			.player-label,
+			.stat-label {
+				display: block;
+				color: var(--accent-primary);
+				text-transform: uppercase;
+				font-size: 0.62rem;
+				margin-bottom: 0.75rem;
+				text-shadow: 0 0 10px rgba(var(--accent-primary-rgb), 0.6);
+			}
+
+			.field {
+				padding: 1.25rem 1rem;
+				border: 2px solid var(--line);
+				background: rgba(4, 8, 24, 0.9);
+				color: var(--text);
+				font: inherit;
+				width: 100%;
+				outline: none;
+			}
+
+			.field::placeholder {
+				color: rgba(245, 247, 255, 0.45);
+			}
+
+			.theme-toggle:focus-visible,
+			.battle-button:focus-visible,
+			.field:focus-visible {
+				outline: 3px solid var(--accent-secondary);
+				outline-offset: 4px;
+			}
+
+			.battle-button {
+				align-self: end;
+				min-height: 100%;
+				padding: 1.25rem 1rem;
+			}
+
+			.battle-grid {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 1rem;
+			}
+
+			.player-card {
+				padding: 1.25rem;
+			}
+
+			.card-head,
+			.stat-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1rem;
+			}
+
+			.username {
+				color: var(--accent-secondary);
+				text-shadow: 0 0 8px rgba(var(--accent-secondary-rgb), 0.8);
+				font-size: 0.85rem;
+			}
+
+			.vs-badge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 4rem;
+				height: 4rem;
+				margin: 0 auto;
+				border-radius: 50%;
+				border: 2px solid var(--accent-primary);
+				background: rgba(8, 16, 42, 0.92);
+				color: var(--accent-primary);
+				box-shadow:
+					0 0 14px rgba(var(--accent-primary-rgb), 0.55),
+					0 0 22px rgba(var(--accent-secondary-rgb), 0.25);
+				animation: pulse 2.2s ease-in-out infinite;
+			}
+
+			.graph {
+				grid-template-columns: repeat(7, 1fr);
+				gap: 0.45rem;
+				padding: 1rem;
+				margin: 1rem 0;
+				border: 1px solid var(--grid-frame);
+				background: rgba(3, 6, 19, 0.85);
+			}
+
+			.day {
+				aspect-ratio: 1;
+				border: 1px solid rgba(255, 255, 255, 0.08);
+				background: var(--day-color);
+				box-shadow: 0 0 12px color-mix(in srgb, var(--day-color) 45%, transparent);
+			}
+
+			.stats {
+				display: grid;
+				gap: 0.75rem;
+			}
+
+			.stat-row {
+				font-size: 0.62rem;
+				color: var(--muted);
+			}
+
+			.stat-value {
+				color: var(--text);
+			}
+
+			.theme-note {
+				margin-top: 1rem;
+				color: var(--muted);
+				font-size: 0.62rem;
+				line-height: 1.7;
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					transform: scale(1);
+					box-shadow:
+						0 0 14px rgba(var(--accent-primary-rgb), 0.55),
+						0 0 22px rgba(var(--accent-secondary-rgb), 0.25);
+				}
+				50% {
+					transform: scale(1.06);
+					box-shadow:
+						0 0 20px rgba(var(--accent-primary-rgb), 0.75),
+						0 0 32px rgba(var(--accent-secondary-rgb), 0.4);
+				}
+			}
+
+			@keyframes shimmer {
+				to {
+					transform: translateX(100%);
+				}
+			}
+
+			@media (max-width: 960px) {
+				.top-bar,
+				.battle-grid,
+				.controls {
+					grid-template-columns: 1fr;
+				}
+
+				.theme-switcher {
+					justify-content: start;
+				}
+
+				.battle-button {
+					min-height: auto;
+				}
+			}
+		</style>
 	</head>
 	<body>
-		<h1>Mona Mayhem</h1>
-		<p>Welcome to Mona Mayhem! Time to build a GitHub Contribution Battle Arena.</p>
+		<main class="page-shell">
+			<section class="top-bar">
+				<div class="marquee">
+					<div class="status-chip">INSERT COINS • BATTLE READY</div>
+					<h1>Mona Mayhem</h1>
+					<p class="subtitle">
+						GitHub contribution battle arena with a neon retro arcade vibe. Flip the
+						palette between the default green/purple cabinet and the new blue/orange
+						voltage mode.
+					</p>
+				</div>
+
+				<div class="theme-switcher">
+					<button
+						id="theme-toggle"
+						class="theme-toggle"
+						type="button"
+						aria-pressed="false"
+						aria-describedby="theme-note"
+					>
+						ALT THEME: OFF
+					</button>
+				</div>
+			</section>
+
+			<section class="controls" aria-label="Battle setup">
+				<div>
+					<label for="player-one">Player 1</label>
+					<input id="player-one" class="field" type="text" value="octocat" />
+				</div>
+				<div>
+					<label for="player-two">Player 2</label>
+					<input id="player-two" class="field" type="text" value="monalisa" />
+				</div>
+				<button class="battle-button" type="button">Start Battle</button>
+			</section>
+
+			<section class="battle-grid" aria-label="Battle preview">
+				<article class="player-card">
+					<div class="card-head">
+						<div>
+							<span class="player-label">Player 1</span>
+							<h2 class="username">@octocat</h2>
+						</div>
+						<div class="vs-badge" aria-hidden="true">P1</div>
+					</div>
+
+					<div class="graph" aria-hidden="true">
+						{
+							sampleDays.map((dayColor) => (
+								<span class="day" style={`--day-color: ${dayColor};`}></span>
+							))
+						}
+					</div>
+
+					<div class="stats">
+						<div class="stat-row">
+							<span class="stat-label">Total</span>
+							<span class="stat-value">842</span>
+						</div>
+						<div class="stat-row">
+							<span class="stat-label">Longest Streak</span>
+							<span class="stat-value">27 days</span>
+						</div>
+					</div>
+				</article>
+
+				<article class="player-card">
+					<div class="card-head">
+						<div>
+							<span class="player-label">Player 2</span>
+							<h2 class="username">@monalisa</h2>
+						</div>
+						<div class="vs-badge" aria-hidden="true">P2</div>
+					</div>
+
+					<div class="graph" aria-hidden="true">
+						{
+							[...sampleDays].reverse().map((dayColor) => (
+								<span class="day" style={`--day-color: ${dayColor};`}></span>
+							))
+						}
+					</div>
+
+					<div class="stats">
+						<div class="stat-row">
+							<span class="stat-label">Total</span>
+							<span class="stat-value">901</span>
+						</div>
+						<div class="stat-row">
+							<span class="stat-label">Longest Streak</span>
+							<span class="stat-value">31 days</span>
+						</div>
+					</div>
+				</article>
+			</section>
+
+			<p id="theme-note" class="theme-note">
+				Toggle saves your preference in localStorage and swaps only the accent tokens,
+				so the retro arcade layout and effects stay the same.
+			</p>
+			<div id="theme-announcer" class="sr-only" aria-live="polite"></div>
+		</main>
+
+		<script is:inline>
+			const root = document.documentElement;
+			const toggle = document.getElementById('theme-toggle');
+			const announcer = document.getElementById('theme-announcer');
+
+			function syncThemeToggle() {
+				if (!(toggle instanceof HTMLButtonElement)) return;
+				const isVoltage = root.getAttribute('data-battle-theme') === 'voltage';
+				toggle.setAttribute('aria-pressed', String(isVoltage));
+				toggle.textContent = isVoltage ? 'ALT THEME: ON' : 'ALT THEME: OFF';
+				if (announcer) {
+					announcer.textContent = isVoltage
+						? 'Blue and orange battle theme enabled.'
+						: 'Green and purple battle theme enabled.';
+				}
+			}
+
+			syncThemeToggle();
+
+			toggle?.addEventListener('click', () => {
+				const isVoltage = root.getAttribute('data-battle-theme') === 'voltage';
+				if (isVoltage) {
+					root.removeAttribute('data-battle-theme');
+					localStorage.removeItem('battle-theme');
+				} else {
+					root.setAttribute('data-battle-theme', 'voltage');
+					localStorage.setItem('battle-theme', 'voltage');
+				}
+				syncThemeToggle();
+			});
+		</script>
 	</body>
 </html>
