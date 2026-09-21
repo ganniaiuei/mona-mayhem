@@ -531,6 +531,10 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 		<script is:inline>
 			const root = document.documentElement;
 			const battleSetup = document.getElementById('battle-setup');
+			const playerOneInput = document.getElementById('player-one');
+			const playerTwoInput = document.getElementById('player-two');
+			const playerOneName = document.getElementById('player-one-name');
+			const playerTwoName = document.getElementById('player-two-name');
 			const toggle = document.getElementById('theme-toggle');
 			const toggleText = document.getElementById('theme-toggle-text');
 			const announcer = document.getElementById('theme-announcer');
@@ -561,8 +565,37 @@ const playerTwoGraph = renderDayCells([...sampleDays].reverse());
 
 			syncThemeToggle();
 
+			function formatHandle(value, fallback) {
+				const trimmed = value.trim().replace(/^@+/, '');
+				return `@${trimmed || fallback}`;
+			}
+
+			function startBattlePreview() {
+				const nextPlayerOne =
+					playerOneInput instanceof HTMLInputElement
+						? formatHandle(playerOneInput.value, 'octocat')
+						: '@octocat';
+				const nextPlayerTwo =
+					playerTwoInput instanceof HTMLInputElement
+						? formatHandle(playerTwoInput.value, 'monalisa')
+						: '@monalisa';
+
+				if (playerOneName) {
+					playerOneName.textContent = nextPlayerOne;
+				}
+
+				if (playerTwoName) {
+					playerTwoName.textContent = nextPlayerTwo;
+				}
+
+				if (announcer) {
+					announcer.textContent = `Battle preview updated for ${nextPlayerOne} versus ${nextPlayerTwo}.`;
+				}
+			}
+
 			battleSetup?.addEventListener('submit', (event) => {
 				event.preventDefault();
+				startBattlePreview();
 			});
 
 			toggle?.addEventListener('click', () => {
