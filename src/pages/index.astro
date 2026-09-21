@@ -31,10 +31,12 @@ const sampleDays = [
 		/>
 		<title>Mona Mayhem</title>
 		<script is:inline>
-			const savedTheme = localStorage.getItem('battle-theme');
-			if (savedTheme === 'voltage') {
-				document.documentElement.setAttribute('data-battle-theme', 'voltage');
-			}
+			try {
+				const savedTheme = localStorage.getItem('battle-theme');
+				if (savedTheme === 'voltage') {
+					document.documentElement.setAttribute('data-battle-theme', 'voltage');
+				}
+			} catch {}
 		</script>
 		<style is:global>
 			:root {
@@ -503,12 +505,12 @@ const sampleDays = [
 				} catch {}
 			}
 
-			function syncThemeToggle() {
+			function syncThemeToggle(announce = false) {
 				if (!(toggle instanceof HTMLButtonElement)) return;
 				const isVoltage = root.getAttribute('data-battle-theme') === 'voltage';
 				toggle.setAttribute('aria-pressed', String(isVoltage));
 				toggle.textContent = isVoltage ? 'ALT THEME: ON' : 'ALT THEME: OFF';
-				if (announcer) {
+				if (announce && announcer) {
 					announcer.textContent = isVoltage
 						? 'Blue and orange battle theme enabled.'
 						: 'Green and purple battle theme enabled.';
@@ -525,7 +527,7 @@ const sampleDays = [
 					root.setAttribute('data-battle-theme', 'voltage');
 				}
 				persistThemePreference(!isVoltage);
-				syncThemeToggle();
+				syncThemeToggle(true);
 			});
 		</script>
 	</body>
