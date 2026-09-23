@@ -10,8 +10,8 @@ const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
 const player1Valid = isValidGitHubUsername(player1FromQuery);
 const player2Valid = isValidGitHubUsername(player2FromQuery);
 const hasValidPair = player1Valid && player2Valid;
-const player1InvalidQuery = hasPlayer1Query && (player1FromQuery.length === 0 || !player1Valid);
-const player2InvalidQuery = hasPlayer2Query && (player2FromQuery.length === 0 || !player2Valid);
+const player1InvalidQuery = (hasBattleQuery && player1FromQuery.length === 0) || (hasPlayer1Query && !player1Valid);
+const player2InvalidQuery = (hasBattleQuery && player2FromQuery.length === 0) || (hasPlayer2Query && !player2Valid);
 const hasInvalidQuery = hasBattleQuery && !hasValidPair;
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
 const battleErrorMessage = hasInvalidQuery
@@ -233,13 +233,10 @@ const battleErrorMessage = hasInvalidQuery
 					class="player-input"
 					type="text"
 					placeholder="Player 1 GitHub Username"
-					pattern={usernamePatternSource}
 					maxlength="39"
-					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player1FromQuery}
 					aria-invalid={player1InvalidQuery ? 'true' : 'false'}
 					aria-describedby={player1InvalidQuery ? 'battle-error' : undefined}
-					required
 				/>
 				<span class="vs" aria-hidden="true">VS</span>
 				<label class="sr-only" for="player2">Player 2 GitHub username</label>
@@ -249,13 +246,10 @@ const battleErrorMessage = hasInvalidQuery
 					class="player-input"
 					type="text"
 					placeholder="Player 2 GitHub Username"
-					pattern={usernamePatternSource}
 					maxlength="39"
-					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player2FromQuery}
 					aria-invalid={player2InvalidQuery ? 'true' : 'false'}
 					aria-describedby={player2InvalidQuery ? 'battle-error' : undefined}
-					required
 				/>
 				<button id="battle-button" type="submit">Start Battle</button>
 			</form>
