@@ -1,12 +1,12 @@
 ---
 const player1FromQuery = Astro.url.searchParams.get('player1')?.trim() ?? '';
 const player2FromQuery = Astro.url.searchParams.get('player2')?.trim() ?? '';
-const hasQueryPlayers = player1FromQuery.length > 0 || player2FromQuery.length > 0;
+const hasBothQueryPlayers = player1FromQuery.length > 0 && player2FromQuery.length > 0;
 const usernamePattern = /^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
 const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
 const hasValidPair = isValidGitHubUsername(player1FromQuery) && isValidGitHubUsername(player2FromQuery);
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
-const battleErrorMessage = hasQueryPlayers && !hasValidPair ? 'Please use valid GitHub usernames to start the battle.' : '';
+const battleErrorMessage = hasBothQueryPlayers && !hasValidPair ? 'Please use valid GitHub usernames to start the battle.' : '';
 
 ---
 
@@ -116,10 +116,12 @@ const battleErrorMessage = hasQueryPlayers && !hasValidPair ? 'Please use valid 
 				box-shadow: 0 0 10px var(--border-glow);
 			}
 
-			#theme-toggle:hover,
-			#theme-toggle:focus-visible {
+			#theme-toggle:hover {
 				color: var(--text);
 				background: var(--accent-primary-surface);
+			}
+
+			#theme-toggle:focus-visible {
 				outline: 2px solid var(--focus-outline);
 				outline-offset: 2px;
 				box-shadow: 0 0 0 3px var(--accent-primary-soft);
