@@ -173,12 +173,39 @@
 		</main>
 		<script>
 			const toggleButton = document.querySelector<HTMLButtonElement>('#theme-toggle');
+			const battleForm = document.querySelector<HTMLFormElement>('.battle-form');
+
+			battleForm?.addEventListener('submit', (event) => {
+				event.preventDefault();
+			});
+
 			if (toggleButton) {
 				const themeAttribute = 'data-theme';
 				const alternateTheme = 'blue-orange';
 				const storageKey = 'mona-theme';
-				const savedTheme = localStorage.getItem(storageKey);
 				const root = document.documentElement;
+				const readStoredTheme = () => {
+					try {
+						return localStorage.getItem(storageKey);
+					} catch {
+						return null;
+					}
+				};
+				const writeStoredTheme = (value: string) => {
+					try {
+						localStorage.setItem(storageKey, value);
+					} catch {
+						// Ignore storage access errors.
+					}
+				};
+				const clearStoredTheme = () => {
+					try {
+						localStorage.removeItem(storageKey);
+					} catch {
+						// Ignore storage access errors.
+					}
+				};
+				const savedTheme = readStoredTheme();
 
 				const syncToggleState = (usingAlternate: boolean) => {
 					toggleButton.textContent = usingAlternate ? 'Switch to Classic Theme' : 'Switch to Blue/Orange';
@@ -200,13 +227,13 @@
 					const usingAlternate = root.getAttribute(themeAttribute) === alternateTheme;
 					if (usingAlternate) {
 						root.removeAttribute(themeAttribute);
-						localStorage.removeItem(storageKey);
+						clearStoredTheme();
 						syncToggleState(false);
 						return;
 					}
 
 					root.setAttribute(themeAttribute, alternateTheme);
-					localStorage.setItem(storageKey, alternateTheme);
+					writeStoredTheme(alternateTheme);
 					syncToggleState(true);
 				});
 			}
