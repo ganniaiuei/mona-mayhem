@@ -221,7 +221,7 @@
 			</form>
 		</main>
 		<script>
-			const toggleButton = document.querySelector<HTMLButtonElement>('#theme-toggle');
+			const toggleButton = document.querySelector('#theme-toggle');
 
 			if (toggleButton) {
 				const themeAttribute = 'data-theme';
@@ -235,7 +235,7 @@
 						return null;
 					}
 				};
-				const writeStoredTheme = (value: string) => {
+				const writeStoredTheme = (value) => {
 					try {
 						localStorage.setItem(storageKey, value);
 					} catch {
