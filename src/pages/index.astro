@@ -221,7 +221,7 @@ const battleErrorMessage = hasInvalidQuery
 	<body>
 		<main class="arena">
 			<div class="controls">
-				<button id="theme-toggle" type="button" aria-pressed="false" aria-label="Theme toggle: Classic Retro active">
+				<button id="theme-toggle" type="button" aria-pressed="false">
 					Switch to Blue/Orange
 				</button>
 			</div>
@@ -392,10 +392,6 @@ const battleErrorMessage = hasInvalidQuery
 				const syncToggleState = (usingAlternate) => {
 					toggleButton.textContent = usingAlternate ? 'Switch to Classic Theme' : 'Switch to Blue/Orange';
 					toggleButton.setAttribute('aria-pressed', usingAlternate ? 'true' : 'false');
-					toggleButton.setAttribute(
-						'aria-label',
-						usingAlternate ? 'Theme toggle: Blue and Orange active' : 'Theme toggle: Classic Retro active'
-					);
 				};
 
 				if (savedTheme === alternateTheme || root.getAttribute(themeAttribute) === alternateTheme) {
