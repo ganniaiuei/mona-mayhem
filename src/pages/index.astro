@@ -1,6 +1,7 @@
 ---
-const player1FromQuery = Astro.url.searchParams.get('player1')?.trim() ?? '';
-const player2FromQuery = Astro.url.searchParams.get('player2')?.trim() ?? '';
+const sanitizeGitHubUsername = (value: string) => value.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 39);
+const player1FromQuery = sanitizeGitHubUsername(Astro.url.searchParams.get('player1')?.trim() ?? '');
+const player2FromQuery = sanitizeGitHubUsername(Astro.url.searchParams.get('player2')?.trim() ?? '');
 const battleMessage =
 	player1FromQuery && player2FromQuery
 		? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!`
