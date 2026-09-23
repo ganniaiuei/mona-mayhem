@@ -1,4 +1,31 @@
 ---
+const player1FromQuery = Astro.url.searchParams.get('player1')?.trim() ?? '';
+const player2FromQuery = Astro.url.searchParams.get('player2')?.trim() ?? '';
+const hasPlayer1Query = Astro.url.searchParams.has('player1');
+const hasPlayer2Query = Astro.url.searchParams.has('player2');
+const hasBattleQuery = hasPlayer1Query || hasPlayer2Query;
+const usernamePatternBody = '(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9\\-]{0,37}[A-Za-z0-9])?';
+const usernamePatternSource = `^${usernamePatternBody}$`;
+const usernamePattern = new RegExp(usernamePatternSource);
+const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
+const player1Valid = hasPlayer1Query && player1FromQuery.length > 0 && isValidGitHubUsername(player1FromQuery);
+const player2Valid = hasPlayer2Query && player2FromQuery.length > 0 && isValidGitHubUsername(player2FromQuery);
+const hasValidPair = hasBattleQuery && player1Valid && player2Valid;
+const player1MissingQuery = hasBattleQuery && !hasPlayer1Query;
+const player2MissingQuery = hasBattleQuery && !hasPlayer2Query;
+const player1InvalidQuery = player1MissingQuery || (hasPlayer1Query && (player1FromQuery.length === 0 || !player1Valid));
+const player2InvalidQuery = player2MissingQuery || (hasPlayer2Query && (player2FromQuery.length === 0 || !player2Valid));
+const hasInvalidQuery = hasBattleQuery && !hasValidPair;
+const invalidUsernameCount =
+	Number(hasPlayer1Query && player1FromQuery.length > 0 && !player1Valid) +
+	Number(hasPlayer2Query && player2FromQuery.length > 0 && !player2Valid);
+const battleErrorMessage = hasInvalidQuery
+	? player1MissingQuery || player2MissingQuery || player1FromQuery.length === 0 || player2FromQuery.length === 0
+		? 'Enter both usernames to start the battle.'
+		: invalidUsernameCount === 1
+			? 'Please use a valid GitHub username to start the battle.'
+			: 'Please use valid GitHub usernames to start the battle.'
+	: '';
 
 ---
 
@@ -9,9 +36,381 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Mona Mayhem</title>
+		<script is:inline>
+			try {
+				if (localStorage.getItem('mona-theme') === 'blue-orange') {
+					document.documentElement.setAttribute('data-theme', 'blue-orange');
+				}
+			} catch {
+				// Ignore storage access errors.
+			}
+		</script>
+		<style>
+			:root {
+				--bg: #05050d;
+				--panel: #121225;
+				--surface-bg: #0b0b19;
+				--text: #f7f7ff;
+				--subtitle: #d5fff4;
+				--accent-primary: #5fed83;
+				--accent-secondary: #8a2be2;
+				--border-glow: rgba(95, 237, 131, 0.55);
+				--accent-primary-soft: rgba(95, 237, 131, 0.35);
+				--accent-secondary-soft: rgba(138, 43, 226, 0.5);
+				--accent-primary-surface: rgba(95, 237, 131, 0.22);
+				--focus-outline: rgba(255, 143, 214, 0.9);
+				--button-start: rgba(138, 43, 226, 0.72);
+				--button-end: rgba(95, 237, 131, 0.72);
+				--shadow: rgba(0, 0, 0, 0.45);
+			}
+
+			:root[data-theme='blue-orange'] {
+				--bg: #05111f;
+				--panel: #10253d;
+				--surface-bg: #0a1a2f;
+				--accent-primary: #00f5ff;
+				--accent-secondary: #ff6b35;
+				--subtitle: #e7f7ff;
+				--border-glow: rgba(0, 245, 255, 0.5);
+				--accent-primary-soft: rgba(0, 245, 255, 0.35);
+				--accent-secondary-soft: rgba(255, 107, 53, 0.5);
+				--accent-primary-surface: rgba(0, 245, 255, 0.22);
+				--focus-outline: rgba(255, 198, 168, 0.95);
+				--button-start: rgba(255, 107, 53, 0.72);
+				--button-end: rgba(0, 245, 255, 0.72);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family: 'Press Start 2P', 'Courier New', monospace;
+				background:
+					radial-gradient(circle at 20% 10%, var(--accent-secondary-soft), transparent 40%),
+					linear-gradient(180deg, #080812 0%, var(--bg) 70%);
+				color: var(--text);
+				display: grid;
+				place-items: center;
+				padding: 24px;
+			}
+
+			.arena {
+				width: min(760px, 100%);
+				background: var(--panel);
+				border: 2px solid var(--accent-primary);
+				box-shadow: 0 0 30px var(--border-glow), 0 12px 40px var(--shadow);
+				padding: 28px;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+				text-transform: uppercase;
+				letter-spacing: 0.12em;
+				color: var(--accent-primary);
+				text-shadow:
+					0 0 8px rgba(255, 255, 255, 0.8),
+					0 0 18px var(--accent-secondary-soft);
+			}
+
+			.subtitle {
+				margin: 12px 0 24px;
+				font-size: 0.72rem;
+				line-height: 1.7;
+				color: var(--subtitle);
+			}
+
+			.controls {
+				display: flex;
+				justify-content: flex-end;
+				margin-bottom: 16px;
+			}
+
+			#theme-toggle {
+				border: 2px solid var(--accent-primary);
+				background: var(--surface-bg);
+				color: var(--accent-primary);
+				font: inherit;
+				font-size: 0.6rem;
+				padding: 10px 12px;
+				text-transform: uppercase;
+				cursor: pointer;
+				box-shadow: 0 0 10px var(--border-glow);
+			}
+
+			#theme-toggle:hover {
+				color: var(--text);
+				background: var(--accent-primary-surface);
+			}
+
+			#theme-toggle:focus-visible {
+				outline: 2px solid var(--focus-outline);
+				outline-offset: 2px;
+				box-shadow: 0 0 0 3px var(--accent-primary-soft);
+			}
+
+			.battle-form {
+				display: grid;
+				grid-template-columns: 1fr auto 1fr;
+				gap: 12px;
+				align-items: center;
+			}
+
+			.player-input,
+			#battle-button {
+				width: 100%;
+				border: 2px solid var(--accent-primary);
+				background: var(--surface-bg);
+				color: var(--text);
+				font: inherit;
+				font-size: 0.64rem;
+				padding: 12px;
+			}
+
+			#battle-button {
+				text-transform: uppercase;
+			}
+
+			.player-input::placeholder {
+				color: rgba(247, 247, 255, 0.7);
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
+			}
+
+			.vs {
+				color: var(--accent-secondary);
+				font-size: 0.8rem;
+				text-shadow: 0 0 10px var(--accent-secondary-soft);
+			}
+
+			#battle-button {
+				grid-column: span 3;
+				cursor: pointer;
+				background: linear-gradient(
+					90deg,
+					var(--button-start),
+					var(--button-end)
+				);
+			}
+
+			@media (max-width: 1024px) {
+				.battle-form {
+					grid-template-columns: 1fr;
+				}
+
+				.vs,
+				#battle-button {
+					grid-column: auto;
+					justify-self: center;
+				}
+
+			}
+		</style>
 	</head>
 	<body>
-		<h1>Mona Mayhem</h1>
-		<p>Welcome to Mona Mayhem! Time to build a GitHub Contribution Battle Arena.</p>
+		<main class="arena">
+			<div class="controls">
+				<button id="theme-toggle" type="button" aria-pressed="false">
+					Switch to Blue/Orange
+				</button>
+			</div>
+			<h1>Contribution Battle Arena</h1>
+			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
+			<form class="battle-form" aria-label="Battle player selection" method="get">
+				<label class="sr-only" for="player1">Player 1 GitHub username</label>
+				<input
+					id="player1"
+					name="player1"
+					class="player-input"
+					type="text"
+					placeholder="Player 1 GitHub Username"
+					pattern={usernamePatternBody}
+					maxlength="39"
+					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
+					value={player1FromQuery}
+					aria-invalid={player1InvalidQuery ? 'true' : undefined}
+					aria-describedby={player1InvalidQuery ? 'battle-error' : undefined}
+					required
+				/>
+				<span class="vs" aria-hidden="true">VS</span>
+				<label class="sr-only" for="player2">Player 2 GitHub username</label>
+				<input
+					id="player2"
+					name="player2"
+					class="player-input"
+					type="text"
+					placeholder="Player 2 GitHub Username"
+					pattern={usernamePatternBody}
+					maxlength="39"
+					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
+					value={player2FromQuery}
+					aria-invalid={player2InvalidQuery ? 'true' : undefined}
+					aria-describedby={player2InvalidQuery ? 'battle-error' : undefined}
+					required
+				/>
+				<button id="battle-button" type="submit">Start Battle</button>
+			</form>
+			{
+				battleErrorMessage && (
+					<p id="battle-error" class="subtitle" role="alert" tabIndex="-1">
+						{battleErrorMessage}
+					</p>
+				)
+			}
+		</main>
+		<script lang="ts">
+			const toggleButton = document.querySelector('#theme-toggle');
+			const battleForm = document.querySelector('.battle-form');
+			const battleInputs =
+				battleForm instanceof HTMLFormElement
+					? Array.from(battleForm.querySelectorAll('.player-input')).filter((input) => input instanceof HTMLInputElement)
+					: [];
+			let battleError = document.querySelector('#battle-error');
+			const battleErrorId = 'battle-error';
+			const setInputErrorState = (input, isInvalid) => {
+				if (isInvalid) {
+					input.setAttribute('aria-invalid', 'true');
+					input.setAttribute('aria-describedby', battleErrorId);
+					return;
+				}
+
+				input.removeAttribute('aria-invalid');
+				input.removeAttribute('aria-describedby');
+			};
+			const getClientBattleError = () => {
+				if (battleError instanceof HTMLElement) {
+					return battleError;
+				}
+
+				if (!(battleForm instanceof HTMLFormElement)) {
+					return null;
+				}
+
+				const errorElement = document.createElement('p');
+				errorElement.id = battleErrorId;
+				errorElement.className = 'subtitle';
+				errorElement.setAttribute('role', 'alert');
+				errorElement.tabIndex = -1;
+				battleForm.insertAdjacentElement('afterend', errorElement);
+				battleError = errorElement;
+				return errorElement;
+			};
+			const syncClientValidationState = () => {
+				const invalidInputs = battleInputs.filter((input) => !input.validity.valid);
+				const hasMissingInput = battleInputs.some((input) => input.value.trim().length === 0);
+				const missingInputs = hasMissingInput
+					? battleInputs.filter((input) => input.value.trim().length === 0)
+					: [];
+
+				battleInputs.forEach((input) => {
+					setInputErrorState(input, invalidInputs.includes(input) || missingInputs.includes(input));
+				});
+
+				if (invalidInputs.length === 0 && !hasMissingInput) {
+					if (battleError instanceof HTMLElement) {
+						battleError.remove();
+						battleError = null;
+					}
+					return invalidInputs;
+				}
+
+				const errorElement = getClientBattleError();
+				if (!(errorElement instanceof HTMLElement)) {
+					return invalidInputs;
+				}
+
+				errorElement.textContent = hasMissingInput
+					? 'Enter both usernames to start the battle.'
+					: invalidInputs.length === 1
+						? 'Please use a valid GitHub username to start the battle.'
+						: 'Please use valid GitHub usernames to start the battle.';
+				errorElement.dataset.validationMode = 'client';
+				return invalidInputs;
+			};
+
+			if (battleForm instanceof HTMLFormElement) {
+				battleForm.addEventListener(
+					'invalid',
+					() => {
+						syncClientValidationState();
+					},
+					true
+				);
+
+				battleInputs.forEach((input) => {
+					input.addEventListener('input', () => {
+						syncClientValidationState();
+					});
+				});
+			}
+
+			if (toggleButton instanceof HTMLButtonElement) {
+				const themeAttribute = 'data-theme';
+				const alternateTheme = 'blue-orange';
+				const storageKey = 'mona-theme';
+				const root = document.documentElement;
+				const readStoredTheme = () => {
+					try {
+						return localStorage.getItem(storageKey);
+					} catch {
+						return null;
+					}
+				};
+				const writeStoredTheme = (value) => {
+					try {
+						localStorage.setItem(storageKey, value);
+					} catch {
+						// Ignore storage access errors.
+					}
+				};
+				const clearStoredTheme = () => {
+					try {
+						localStorage.removeItem(storageKey);
+					} catch {
+						// Ignore storage access errors.
+					}
+				};
+				const savedTheme = readStoredTheme();
+
+				const syncToggleState = (usingAlternate) => {
+					toggleButton.textContent = usingAlternate ? 'Switch to Classic Theme' : 'Switch to Blue/Orange';
+					toggleButton.setAttribute('aria-pressed', usingAlternate ? 'true' : 'false');
+				};
+
+				if (savedTheme === alternateTheme || root.getAttribute(themeAttribute) === alternateTheme) {
+					root.setAttribute(themeAttribute, alternateTheme);
+					syncToggleState(true);
+				} else {
+					syncToggleState(false);
+				}
+
+				toggleButton.addEventListener('click', () => {
+					const usingAlternate = root.getAttribute(themeAttribute) === alternateTheme;
+					if (usingAlternate) {
+						root.removeAttribute(themeAttribute);
+						clearStoredTheme();
+						syncToggleState(false);
+						return;
+					}
+
+					root.setAttribute(themeAttribute, alternateTheme);
+					writeStoredTheme(alternateTheme);
+					syncToggleState(true);
+				});
+			}
+		</script>
 	</body>
 </html>
