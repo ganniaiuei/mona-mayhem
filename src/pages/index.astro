@@ -5,8 +5,9 @@ const hasBothQueryPlayers = player1FromQuery.length > 0 && player2FromQuery.leng
 const usernamePattern = /^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
 const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
 const hasValidPair = isValidGitHubUsername(player1FromQuery) && isValidGitHubUsername(player2FromQuery);
+const hasInvalidQuery = hasBothQueryPlayers && !hasValidPair;
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
-const battleErrorMessage = hasBothQueryPlayers && !hasValidPair ? 'Please use valid GitHub usernames to start the battle.' : '';
+const battleErrorMessage = hasInvalidQuery ? 'Please use valid GitHub usernames to start the battle.' : '';
 
 ---
 
@@ -219,6 +220,8 @@ const battleErrorMessage = hasBothQueryPlayers && !hasValidPair ? 'Please use va
 					maxlength="39"
 					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player1FromQuery}
+					aria-invalid={hasInvalidQuery ? 'true' : 'false'}
+					aria-describedby={hasInvalidQuery ? 'battle-error' : undefined}
 					required
 				/>
 				<span class="vs" aria-hidden="true">VS</span>
@@ -233,20 +236,22 @@ const battleErrorMessage = hasBothQueryPlayers && !hasValidPair ? 'Please use va
 					maxlength="39"
 					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player2FromQuery}
+					aria-invalid={hasInvalidQuery ? 'true' : 'false'}
+					aria-describedby={hasInvalidQuery ? 'battle-error' : undefined}
 					required
 				/>
 				<button id="battle-button" type="submit">Start Battle</button>
 			</form>
 			{
 				battleErrorMessage && (
-					<p class="subtitle" aria-live="polite">
+					<p id="battle-error" class="subtitle" role="alert">
 						{battleErrorMessage}
 					</p>
 				)
 			}
 			{
 				battleMessage && (
-					<p class="subtitle" aria-live="polite">
+					<p id="battle-result" class="subtitle" aria-live="polite" tabindex="-1">
 						{battleMessage}
 					</p>
 				)
@@ -254,6 +259,11 @@ const battleErrorMessage = hasBothQueryPlayers && !hasValidPair ? 'Please use va
 		</main>
 		<script>
 			const toggleButton = document.querySelector('#theme-toggle');
+			const battleResult = document.querySelector('#battle-result');
+
+			if (battleResult instanceof HTMLElement) {
+				requestAnimationFrame(() => battleResult.focus());
+			}
 
 			if (toggleButton) {
 				const themeAttribute = 'data-theme';
