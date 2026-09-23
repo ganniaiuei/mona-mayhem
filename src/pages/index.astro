@@ -9,9 +9,187 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Mona Mayhem</title>
+		<style>
+			:root {
+				--bg: #05050d;
+				--panel: #121225;
+				--text: #f7f7ff;
+				--accent-primary: #5fed83;
+				--accent-secondary: #8a2be2;
+				--border-glow: rgba(95, 237, 131, 0.55);
+				--shadow: rgba(0, 0, 0, 0.45);
+			}
+
+			body[data-theme='blue-orange'] {
+				--accent-primary: #00f5ff;
+				--accent-secondary: #ff6b35;
+				--border-glow: rgba(0, 245, 255, 0.5);
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family: 'Press Start 2P', 'Courier New', monospace;
+				background:
+					radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--accent-secondary) 25%, transparent), transparent 40%),
+					linear-gradient(180deg, #080812 0%, var(--bg) 70%);
+				color: var(--text);
+				display: grid;
+				place-items: center;
+				padding: 24px;
+			}
+
+			.arena {
+				width: min(760px, 100%);
+				background: var(--panel);
+				border: 2px solid var(--accent-primary);
+				box-shadow: 0 0 30px var(--border-glow), 0 12px 40px var(--shadow);
+				padding: 28px;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+				text-transform: uppercase;
+				letter-spacing: 0.12em;
+				color: var(--accent-primary);
+				text-shadow:
+					0 0 8px color-mix(in srgb, var(--accent-primary) 70%, #fff),
+					0 0 18px color-mix(in srgb, var(--accent-secondary) 45%, transparent);
+			}
+
+			.subtitle {
+				margin: 12px 0 24px;
+				font-size: 0.72rem;
+				line-height: 1.7;
+				color: color-mix(in srgb, var(--text) 85%, var(--accent-primary));
+			}
+
+			.controls {
+				display: flex;
+				justify-content: flex-end;
+				margin-bottom: 16px;
+			}
+
+			#theme-toggle {
+				border: 2px solid var(--accent-primary);
+				background: #0b0b19;
+				color: var(--accent-primary);
+				font: inherit;
+				font-size: 0.6rem;
+				padding: 10px 12px;
+				text-transform: uppercase;
+				cursor: pointer;
+				box-shadow: 0 0 10px var(--border-glow);
+			}
+
+			#theme-toggle:hover,
+			#theme-toggle:focus-visible {
+				outline: none;
+				color: var(--text);
+				background: color-mix(in srgb, var(--accent-primary) 22%, #0b0b19);
+			}
+
+			.battle-form {
+				display: grid;
+				grid-template-columns: 1fr auto 1fr;
+				gap: 12px;
+				align-items: center;
+			}
+
+			.player-input,
+			#battle-button {
+				width: 100%;
+				border: 2px solid var(--accent-primary);
+				background: #0b0b19;
+				color: var(--text);
+				font: inherit;
+				font-size: 0.64rem;
+				padding: 12px;
+				text-transform: uppercase;
+			}
+
+			.player-input::placeholder {
+				color: color-mix(in srgb, var(--text) 70%, transparent);
+			}
+
+			.vs {
+				color: var(--accent-secondary);
+				font-size: 0.8rem;
+				text-shadow: 0 0 10px color-mix(in srgb, var(--accent-secondary) 80%, #fff);
+			}
+
+			#battle-button {
+				grid-column: span 3;
+				cursor: pointer;
+				background: linear-gradient(
+					90deg,
+					color-mix(in srgb, var(--accent-secondary) 65%, #111),
+					color-mix(in srgb, var(--accent-primary) 65%, #111)
+				);
+			}
+
+			@media (max-width: 640px) {
+				.battle-form {
+					grid-template-columns: 1fr;
+				}
+
+				.vs,
+				#battle-button {
+					grid-column: auto;
+					justify-self: center;
+				}
+			}
+		</style>
 	</head>
 	<body>
-		<h1>Mona Mayhem</h1>
-		<p>Welcome to Mona Mayhem! Time to build a GitHub Contribution Battle Arena.</p>
+		<main class="arena">
+			<div class="controls">
+				<button id="theme-toggle" type="button" aria-pressed="false">Switch to Blue/Orange</button>
+			</div>
+			<h1>Contribution Battle Arena</h1>
+			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
+			<form class="battle-form">
+				<input class="player-input" type="text" placeholder="Player 1 GitHub Username" />
+				<span class="vs">VS</span>
+				<input class="player-input" type="text" placeholder="Player 2 GitHub Username" />
+				<button id="battle-button" type="submit">Start Battle</button>
+			</form>
+		</main>
+		<script>
+			const toggleButton = document.querySelector<HTMLButtonElement>('#theme-toggle');
+			if (toggleButton) {
+				const themeAttribute = 'data-theme';
+				const alternateTheme = 'blue-orange';
+				const storageKey = 'mona-theme';
+				const savedTheme = localStorage.getItem(storageKey);
+
+				if (savedTheme === alternateTheme) {
+					document.body.setAttribute(themeAttribute, alternateTheme);
+					toggleButton.textContent = 'Switch to Classic Theme';
+					toggleButton.setAttribute('aria-pressed', 'true');
+				}
+
+				toggleButton.addEventListener('click', () => {
+					const usingAlternate = document.body.getAttribute(themeAttribute) === alternateTheme;
+					if (usingAlternate) {
+						document.body.removeAttribute(themeAttribute);
+						localStorage.removeItem(storageKey);
+						toggleButton.textContent = 'Switch to Blue/Orange';
+						toggleButton.setAttribute('aria-pressed', 'false');
+						return;
+					}
+
+					document.body.setAttribute(themeAttribute, alternateTheme);
+					localStorage.setItem(storageKey, alternateTheme);
+					toggleButton.textContent = 'Switch to Classic Theme';
+					toggleButton.setAttribute('aria-pressed', 'true');
+				});
+			}
+		</script>
 	</body>
 </html>
