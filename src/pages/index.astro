@@ -311,13 +311,16 @@ const battleErrorMessage = hasInvalidQuery
 			const syncClientValidationState = () => {
 				const invalidInputs = battleInputs.filter((input) => !input.validity.valid);
 				const hasMissingInput = battleInputs.some((input) => input.value.trim().length === 0);
+				const missingInputs = hasMissingInput
+					? battleInputs.filter((input) => input.value.trim().length === 0)
+					: [];
 
 				battleInputs.forEach((input) => {
-					setInputErrorState(input, invalidInputs.includes(input));
+					setInputErrorState(input, invalidInputs.includes(input) || missingInputs.includes(input));
 				});
 
 				if (invalidInputs.length === 0) {
-					if (battleError instanceof HTMLElement && battleError.dataset.validationMode === 'client') {
+					if (battleError instanceof HTMLElement) {
 						battleError.remove();
 						battleError = null;
 					}
@@ -354,7 +357,7 @@ const battleErrorMessage = hasInvalidQuery
 				});
 			}
 
-			if (toggleButton) {
+			if (toggleButton instanceof HTMLButtonElement) {
 				const themeAttribute = 'data-theme';
 				const alternateTheme = 'blue-orange';
 				const storageKey = 'mona-theme';
