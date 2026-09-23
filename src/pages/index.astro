@@ -279,6 +279,7 @@ const battleErrorMessage = hasInvalidQuery
 		<script>
 			const toggleButton = document.querySelector('#theme-toggle');
 			const battleForm = document.querySelector('.battle-form');
+			const battleResult = document.querySelector('#battle-result');
 			const battleInputs =
 				battleForm instanceof HTMLFormElement
 					? Array.from(battleForm.querySelectorAll('.player-input')).filter((input) => input instanceof HTMLInputElement)
@@ -349,6 +350,8 @@ const battleErrorMessage = hasInvalidQuery
 
 			if (battleError instanceof HTMLElement) {
 				focusFirstInvalidInput();
+			} else if (battleResult instanceof HTMLElement) {
+				requestAnimationFrame(() => battleResult.focus());
 			}
 
 			if (battleForm instanceof HTMLFormElement) {
