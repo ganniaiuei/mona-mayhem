@@ -251,7 +251,7 @@
 				};
 				const savedTheme = readStoredTheme();
 
-				const syncToggleState = (usingAlternate: boolean) => {
+				const syncToggleState = (usingAlternate) => {
 					toggleButton.textContent = usingAlternate ? 'Switch to Classic Theme' : 'Switch to Blue/Orange';
 					toggleButton.setAttribute('aria-pressed', usingAlternate ? 'true' : 'false');
 					toggleButton.setAttribute(
