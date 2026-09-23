@@ -10,8 +10,10 @@ const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
 const player1Valid = isValidGitHubUsername(player1FromQuery);
 const player2Valid = isValidGitHubUsername(player2FromQuery);
 const hasValidPair = player1Valid && player2Valid;
-const player1InvalidQuery = (hasBattleQuery && player1FromQuery.length === 0) || (hasPlayer1Query && !player1Valid);
-const player2InvalidQuery = (hasBattleQuery && player2FromQuery.length === 0) || (hasPlayer2Query && !player2Valid);
+const player1MissingQuery = hasBattleQuery && !hasPlayer1Query;
+const player2MissingQuery = hasBattleQuery && !hasPlayer2Query;
+const player1InvalidQuery = player1MissingQuery || (hasPlayer1Query && (player1FromQuery.length === 0 || !player1Valid));
+const player2InvalidQuery = player2MissingQuery || (hasPlayer2Query && (player2FromQuery.length === 0 || !player2Valid));
 const hasInvalidQuery = hasBattleQuery && !hasValidPair;
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
 const battleErrorMessage = hasInvalidQuery
@@ -225,7 +227,7 @@ const battleErrorMessage = hasInvalidQuery
 			</div>
 			<h1>Contribution Battle Arena</h1>
 			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
-			<form class="battle-form" aria-label="Battle player selection" method="get" novalidate>
+			<form class="battle-form" aria-label="Battle player selection" method="get">
 				<label class="sr-only" for="player1">Player 1 GitHub username</label>
 				<input
 					id="player1"
@@ -233,10 +235,13 @@ const battleErrorMessage = hasInvalidQuery
 					class="player-input"
 					type="text"
 					placeholder="Player 1 GitHub Username"
+					pattern={usernamePatternSource}
 					maxlength="39"
+					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player1FromQuery}
 					aria-invalid={player1InvalidQuery ? 'true' : 'false'}
 					aria-describedby={player1InvalidQuery ? 'battle-error' : undefined}
+					required
 				/>
 				<span class="vs" aria-hidden="true">VS</span>
 				<label class="sr-only" for="player2">Player 2 GitHub username</label>
@@ -246,10 +251,13 @@ const battleErrorMessage = hasInvalidQuery
 					class="player-input"
 					type="text"
 					placeholder="Player 2 GitHub Username"
+					pattern={usernamePatternSource}
 					maxlength="39"
+					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player2FromQuery}
 					aria-invalid={player2InvalidQuery ? 'true' : 'false'}
 					aria-describedby={player2InvalidQuery ? 'battle-error' : undefined}
+					required
 				/>
 				<button id="battle-button" type="submit">Start Battle</button>
 			</form>
@@ -270,13 +278,94 @@ const battleErrorMessage = hasInvalidQuery
 		</main>
 		<script>
 			const toggleButton = document.querySelector('#theme-toggle');
-			const battleError = document.querySelector('#battle-error');
-
-			if (battleError instanceof HTMLElement) {
-				const firstInvalidInput = document.querySelector('.player-input[aria-invalid="true"]');
+			const battleForm = document.querySelector('.battle-form');
+			const battleInputs =
+				battleForm instanceof HTMLFormElement
+					? Array.from(battleForm.querySelectorAll('.player-input')).filter((input) => input instanceof HTMLInputElement)
+					: [];
+			let battleError = document.querySelector('#battle-error');
+			const battleErrorId = 'battle-error';
+			const getFirstInvalidInput = () => document.querySelector('.player-input[aria-invalid="true"]');
+			const focusFirstInvalidInput = () => {
+				const firstInvalidInput = getFirstInvalidInput();
 				if (firstInvalidInput instanceof HTMLElement) {
 					requestAnimationFrame(() => firstInvalidInput.focus());
 				}
+			};
+			const setInputErrorState = (input, isInvalid) => {
+				input.setAttribute('aria-invalid', isInvalid ? 'true' : 'false');
+				if (isInvalid) {
+					input.setAttribute('aria-describedby', battleErrorId);
+					return;
+				}
+
+				input.removeAttribute('aria-describedby');
+			};
+			const getClientBattleError = () => {
+				if (battleError instanceof HTMLElement) {
+					return battleError;
+				}
+
+				if (!(battleForm instanceof HTMLFormElement)) {
+					return null;
+				}
+
+				const errorElement = document.createElement('p');
+				errorElement.id = battleErrorId;
+				errorElement.className = 'subtitle';
+				errorElement.setAttribute('role', 'alert');
+				battleForm.insertAdjacentElement('afterend', errorElement);
+				battleError = errorElement;
+				return errorElement;
+			};
+			const syncClientValidationState = () => {
+				const invalidInputs = battleInputs.filter((input) => !input.validity.valid);
+
+				battleInputs.forEach((input) => {
+					setInputErrorState(input, invalidInputs.includes(input));
+				});
+
+				if (invalidInputs.length === 0) {
+					if (battleError instanceof HTMLElement && battleError.dataset.validationMode === 'client') {
+						battleError.remove();
+						battleError = null;
+					}
+					return invalidInputs;
+				}
+
+				const errorElement = getClientBattleError();
+				if (!(errorElement instanceof HTMLElement)) {
+					return invalidInputs;
+				}
+
+				errorElement.textContent = invalidInputs.some((input) => input.validity.valueMissing)
+					? 'Enter both usernames to start the battle.'
+					: 'Please use valid GitHub usernames to start the battle.';
+				errorElement.dataset.validationMode = 'client';
+				return invalidInputs;
+			};
+
+			if (battleError instanceof HTMLElement) {
+				focusFirstInvalidInput();
+			}
+
+			if (battleForm instanceof HTMLFormElement) {
+				battleForm.addEventListener(
+					'invalid',
+					() => {
+						const invalidInputs = syncClientValidationState();
+						if (invalidInputs.length > 0) {
+							focusFirstInvalidInput();
+						}
+					},
+					true
+				);
+
+				battleInputs.forEach((input) => {
+					input.addEventListener('input', () => {
+						syncClientValidationState();
+					});
+				});
 			}
 
 			if (toggleButton) {
