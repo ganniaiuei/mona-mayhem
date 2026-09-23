@@ -348,10 +348,7 @@ const battleErrorMessage = hasInvalidQuery
 				battleForm.addEventListener(
 					'invalid',
 					() => {
-						const invalidInputs = syncClientValidationState();
-						if (invalidInputs.length > 0) {
-							focusFirstInvalidInput();
-						}
+						syncClientValidationState();
 					},
 					true
 				);
