@@ -1,11 +1,12 @@
 ---
-const sanitizeGitHubUsername = (value: string) => value.replace(/[^a-zA-Z0-9-]/g, '').slice(0, 39);
-const player1FromQuery = sanitizeGitHubUsername(Astro.url.searchParams.get('player1')?.trim() ?? '');
-const player2FromQuery = sanitizeGitHubUsername(Astro.url.searchParams.get('player2')?.trim() ?? '');
-const battleMessage =
-	player1FromQuery && player2FromQuery
-		? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!`
-		: '';
+const player1FromQuery = Astro.url.searchParams.get('player1')?.trim() ?? '';
+const player2FromQuery = Astro.url.searchParams.get('player2')?.trim() ?? '';
+const hasQueryPlayers = player1FromQuery.length > 0 || player2FromQuery.length > 0;
+const usernamePattern = /^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
+const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
+const hasValidPair = isValidGitHubUsername(player1FromQuery) && isValidGitHubUsername(player2FromQuery);
+const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
+const battleErrorMessage = hasQueryPlayers && !hasValidPair ? 'Please use valid GitHub usernames to start the battle.' : '';
 
 ---
 
@@ -212,9 +213,10 @@ const battleMessage =
 					class="player-input"
 					type="text"
 					placeholder="Player 1 GitHub Username"
-					pattern="[A-Za-z0-9-]+"
+					pattern="^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
 					maxlength="39"
-					title="Use 1-39 letters, numbers, or hyphens."
+					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
+					value={player1FromQuery}
 					required
 				/>
 				<span class="vs" aria-hidden="true">VS</span>
@@ -225,13 +227,21 @@ const battleMessage =
 					class="player-input"
 					type="text"
 					placeholder="Player 2 GitHub Username"
-					pattern="[A-Za-z0-9-]+"
+					pattern="^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
 					maxlength="39"
-					title="Use 1-39 letters, numbers, or hyphens."
+					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
+					value={player2FromQuery}
 					required
 				/>
 				<button id="battle-button" type="submit">Start Battle</button>
 			</form>
+			{
+				battleErrorMessage && (
+					<p class="subtitle" aria-live="polite">
+						{battleErrorMessage}
+					</p>
+				)
+			}
 			{
 				battleMessage && (
 					<p class="subtitle" aria-live="polite">
