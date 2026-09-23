@@ -204,7 +204,7 @@ const battleMessage =
 			</div>
 			<h1>Contribution Battle Arena</h1>
 			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
-			<form class="battle-form" aria-label="Battle player selection" method="get" action="/">
+			<form class="battle-form" aria-label="Battle player selection" method="get">
 				<label class="sr-only" for="player1">Player 1 GitHub username</label>
 				<input
 					id="player1"
@@ -212,6 +212,9 @@ const battleMessage =
 					class="player-input"
 					type="text"
 					placeholder="Player 1 GitHub Username"
+					pattern="[A-Za-z0-9-]+"
+					maxlength="39"
+					title="Use 1-39 letters, numbers, or hyphens."
 					required
 				/>
 				<span class="vs" aria-hidden="true">VS</span>
@@ -222,6 +225,9 @@ const battleMessage =
 					class="player-input"
 					type="text"
 					placeholder="Player 2 GitHub Username"
+					pattern="[A-Za-z0-9-]+"
+					maxlength="39"
+					title="Use 1-39 letters, numbers, or hyphens."
 					required
 				/>
 				<button id="battle-button" type="submit">Start Battle</button>
