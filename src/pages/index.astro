@@ -319,7 +319,7 @@ const battleErrorMessage = hasInvalidQuery
 					setInputErrorState(input, invalidInputs.includes(input) || missingInputs.includes(input));
 				});
 
-				if (invalidInputs.length === 0) {
+				if (invalidInputs.length === 0 && !hasMissingInput) {
 					if (battleError instanceof HTMLElement) {
 						battleError.remove();
 						battleError = null;
