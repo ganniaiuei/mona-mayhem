@@ -336,7 +336,8 @@ const battleErrorMessage = hasInvalidQuery
 				if (invalidInputs.length > 0) {
 					focusFirstInvalidInput();
 				} else {
-					requestAnimationFrame(() => battleError.focus());
+					battleError.remove();
+					battleError = null;
 				}
 			}
 
