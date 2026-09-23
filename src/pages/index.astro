@@ -277,12 +277,13 @@ const battleErrorMessage = hasInvalidQuery
 				}
 			};
 			const setInputErrorState = (input, isInvalid) => {
-				input.setAttribute('aria-invalid', isInvalid ? 'true' : 'false');
 				if (isInvalid) {
+					input.setAttribute('aria-invalid', 'true');
 					input.setAttribute('aria-describedby', battleErrorId);
 					return;
 				}
 
+				input.removeAttribute('aria-invalid');
 				input.removeAttribute('aria-describedby');
 			};
 			const getClientBattleError = () => {
@@ -331,7 +332,12 @@ const battleErrorMessage = hasInvalidQuery
 			};
 
 			if (battleError instanceof HTMLElement) {
-				requestAnimationFrame(() => battleError.focus());
+				const invalidInputs = syncClientValidationState();
+				if (invalidInputs.length > 0) {
+					focusFirstInvalidInput();
+				} else {
+					requestAnimationFrame(() => battleError.focus());
+				}
 			}
 
 			if (battleForm instanceof HTMLFormElement) {
