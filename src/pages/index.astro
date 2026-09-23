@@ -2,18 +2,20 @@
 const player1FromQuery = Astro.url.searchParams.get('player1')?.trim() ?? '';
 const player2FromQuery = Astro.url.searchParams.get('player2')?.trim() ?? '';
 const hasAnyQueryPlayers = player1FromQuery.length > 0 || player2FromQuery.length > 0;
-const hasBothQueryPlayers = player1FromQuery.length > 0 && player2FromQuery.length > 0;
 const usernamePatternSource = '^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$';
 const usernamePattern = new RegExp(usernamePatternSource);
 const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
-const hasValidPair =
-	hasBothQueryPlayers && isValidGitHubUsername(player1FromQuery) && isValidGitHubUsername(player2FromQuery);
+const player1Valid = isValidGitHubUsername(player1FromQuery);
+const player2Valid = isValidGitHubUsername(player2FromQuery);
+const hasValidPair = player1Valid && player2Valid;
+const player1InvalidQuery = hasAnyQueryPlayers && !player1Valid;
+const player2InvalidQuery = hasAnyQueryPlayers && !player2Valid;
 const hasInvalidQuery = hasAnyQueryPlayers && !hasValidPair;
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
 const battleErrorMessage = hasInvalidQuery
-	? hasBothQueryPlayers
-		? 'Please use valid GitHub usernames to start the battle.'
-		: 'Enter both usernames to start the battle.'
+	? player1FromQuery.length === 0 || player2FromQuery.length === 0
+		? 'Enter both usernames to start the battle.'
+		: 'Please use valid GitHub usernames to start the battle.'
 	: '';
 
 ---
@@ -38,7 +40,9 @@ const battleErrorMessage = hasInvalidQuery
 			:root {
 				--bg: #05050d;
 				--panel: #121225;
+				--surface-bg: #0b0b19;
 				--text: #f7f7ff;
+				--subtitle: #d5fff4;
 				--accent-primary: #5fed83;
 				--accent-secondary: #8a2be2;
 				--border-glow: rgba(95, 237, 131, 0.55);
@@ -52,8 +56,12 @@ const battleErrorMessage = hasInvalidQuery
 			}
 
 			:root[data-theme='blue-orange'] {
+				--bg: #05111f;
+				--panel: #10253d;
+				--surface-bg: #0a1a2f;
 				--accent-primary: #00f5ff;
 				--accent-secondary: #ff6b35;
+				--subtitle: #e7f7ff;
 				--border-glow: rgba(0, 245, 255, 0.5);
 				--accent-primary-soft: rgba(0, 245, 255, 0.35);
 				--accent-secondary-soft: rgba(255, 107, 53, 0.5);
@@ -103,7 +111,7 @@ const battleErrorMessage = hasInvalidQuery
 				margin: 12px 0 24px;
 				font-size: 0.72rem;
 				line-height: 1.7;
-				color: #d5fff4;
+				color: var(--subtitle);
 			}
 
 			.controls {
@@ -114,7 +122,7 @@ const battleErrorMessage = hasInvalidQuery
 
 			#theme-toggle {
 				border: 2px solid var(--accent-primary);
-				background: #0b0b19;
+				background: var(--surface-bg);
 				color: var(--accent-primary);
 				font: inherit;
 				font-size: 0.6rem;
@@ -146,7 +154,7 @@ const battleErrorMessage = hasInvalidQuery
 			#battle-button {
 				width: 100%;
 				border: 2px solid var(--accent-primary);
-				background: #0b0b19;
+				background: var(--surface-bg);
 				color: var(--text);
 				font: inherit;
 				font-size: 0.64rem;
@@ -227,8 +235,8 @@ const battleErrorMessage = hasInvalidQuery
 					maxlength="39"
 					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player1FromQuery}
-					aria-invalid={hasInvalidQuery ? 'true' : 'false'}
-					aria-describedby={hasInvalidQuery ? 'battle-error' : undefined}
+					aria-invalid={player1InvalidQuery ? 'true' : 'false'}
+					aria-describedby={player1InvalidQuery ? 'battle-error' : undefined}
 					required
 				/>
 				<span class="vs" aria-hidden="true">VS</span>
@@ -243,8 +251,8 @@ const battleErrorMessage = hasInvalidQuery
 					maxlength="39"
 					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player2FromQuery}
-					aria-invalid={hasInvalidQuery ? 'true' : 'false'}
-					aria-describedby={hasInvalidQuery ? 'battle-error' : undefined}
+					aria-invalid={player2InvalidQuery ? 'true' : 'false'}
+					aria-describedby={player2InvalidQuery ? 'battle-error' : undefined}
 					required
 				/>
 				<button id="battle-button" type="submit">Start Battle</button>
@@ -266,13 +274,13 @@ const battleErrorMessage = hasInvalidQuery
 		</main>
 		<script>
 			const toggleButton = document.querySelector('#theme-toggle');
-			const battleResult = document.querySelector('#battle-result');
 			const battleError = document.querySelector('#battle-error');
 
-			if (battleResult instanceof HTMLElement) {
-				requestAnimationFrame(() => battleResult.focus());
-			} else if (battleError instanceof HTMLElement) {
-				requestAnimationFrame(() => battleError.focus());
+			if (battleError instanceof HTMLElement) {
+				const firstInvalidInput = document.querySelector('.player-input[aria-invalid="true"]');
+				if (firstInvalidInput instanceof HTMLElement) {
+					requestAnimationFrame(() => firstInvalidInput.focus());
+				}
 			}
 
 			if (toggleButton) {
