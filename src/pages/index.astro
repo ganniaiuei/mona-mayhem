@@ -310,6 +310,7 @@ const battleErrorMessage = hasInvalidQuery
 			};
 			const syncClientValidationState = () => {
 				const invalidInputs = battleInputs.filter((input) => !input.validity.valid);
+				const hasMissingInput = battleInputs.some((input) => input.value.trim().length === 0);
 
 				battleInputs.forEach((input) => {
 					setInputErrorState(input, invalidInputs.includes(input));
@@ -328,7 +329,7 @@ const battleErrorMessage = hasInvalidQuery
 					return invalidInputs;
 				}
 
-				errorElement.textContent = invalidInputs.some((input) => input.value.trim().length === 0)
+				errorElement.textContent = hasMissingInput
 					? 'Enter both usernames to start the battle.'
 					: invalidInputs.length === 1
 						? 'Please use a valid GitHub username to start the battle.'
