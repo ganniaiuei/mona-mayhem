@@ -1,13 +1,20 @@
 ---
 const player1FromQuery = Astro.url.searchParams.get('player1')?.trim() ?? '';
 const player2FromQuery = Astro.url.searchParams.get('player2')?.trim() ?? '';
+const hasAnyQueryPlayers = player1FromQuery.length > 0 || player2FromQuery.length > 0;
 const hasBothQueryPlayers = player1FromQuery.length > 0 && player2FromQuery.length > 0;
-const usernamePattern = /^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
+const usernamePatternSource = '^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$';
+const usernamePattern = new RegExp(usernamePatternSource);
 const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
-const hasValidPair = isValidGitHubUsername(player1FromQuery) && isValidGitHubUsername(player2FromQuery);
-const hasInvalidQuery = hasBothQueryPlayers && !hasValidPair;
+const hasValidPair =
+	hasBothQueryPlayers && isValidGitHubUsername(player1FromQuery) && isValidGitHubUsername(player2FromQuery);
+const hasInvalidQuery = hasAnyQueryPlayers && !hasValidPair;
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
-const battleErrorMessage = hasInvalidQuery ? 'Please use valid GitHub usernames to start the battle.' : '';
+const battleErrorMessage = hasInvalidQuery
+	? hasBothQueryPlayers
+		? 'Please use valid GitHub usernames to start the battle.'
+		: 'Enter both usernames to start the battle.'
+	: '';
 
 ---
 
@@ -216,7 +223,7 @@ const battleErrorMessage = hasInvalidQuery ? 'Please use valid GitHub usernames 
 					class="player-input"
 					type="text"
 					placeholder="Player 1 GitHub Username"
-					pattern="^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
+					pattern={usernamePatternSource}
 					maxlength="39"
 					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player1FromQuery}
@@ -232,7 +239,7 @@ const battleErrorMessage = hasInvalidQuery ? 'Please use valid GitHub usernames 
 					class="player-input"
 					type="text"
 					placeholder="Player 2 GitHub Username"
-					pattern="^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
+					pattern={usernamePatternSource}
 					maxlength="39"
 					title="Use a valid GitHub username (1-39 letters/numbers, optional single hyphens, no leading/trailing hyphen)."
 					value={player2FromQuery}
@@ -244,7 +251,7 @@ const battleErrorMessage = hasInvalidQuery ? 'Please use valid GitHub usernames 
 			</form>
 			{
 				battleErrorMessage && (
-					<p id="battle-error" class="subtitle" role="alert">
+					<p id="battle-error" class="subtitle" role="alert" tabindex="-1">
 						{battleErrorMessage}
 					</p>
 				)
@@ -260,9 +267,12 @@ const battleErrorMessage = hasInvalidQuery ? 'Please use valid GitHub usernames 
 		<script>
 			const toggleButton = document.querySelector('#theme-toggle');
 			const battleResult = document.querySelector('#battle-result');
+			const battleError = document.querySelector('#battle-error');
 
 			if (battleResult instanceof HTMLElement) {
 				requestAnimationFrame(() => battleResult.focus());
+			} else if (battleError instanceof HTMLElement) {
+				requestAnimationFrame(() => battleError.focus());
 			}
 
 			if (toggleButton) {
