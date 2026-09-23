@@ -16,10 +16,15 @@ const player2MissingQuery = hasBattleQuery && !hasPlayer2Query;
 const player1InvalidQuery = player1MissingQuery || (hasPlayer1Query && (player1FromQuery.length === 0 || !player1Valid));
 const player2InvalidQuery = player2MissingQuery || (hasPlayer2Query && (player2FromQuery.length === 0 || !player2Valid));
 const hasInvalidQuery = hasBattleQuery && !hasValidPair;
+const invalidUsernameCount =
+	Number(hasPlayer1Query && player1FromQuery.length > 0 && !player1Valid) +
+	Number(hasPlayer2Query && player2FromQuery.length > 0 && !player2Valid);
 const battleErrorMessage = hasInvalidQuery
 	? player1MissingQuery || player2MissingQuery || player1FromQuery.length === 0 || player2FromQuery.length === 0
 		? 'Enter both usernames to start the battle.'
-		: 'Please use valid GitHub usernames to start the battle.'
+		: invalidUsernameCount === 1
+			? 'Please use a valid GitHub username to start the battle.'
+			: 'Please use valid GitHub usernames to start the battle.'
 	: '';
 
 ---
@@ -332,18 +337,12 @@ const battleErrorMessage = hasInvalidQuery
 
 				errorElement.textContent = invalidInputs.some((input) => input.value.trim().length === 0)
 					? 'Enter both usernames to start the battle.'
-					: 'Please use valid GitHub usernames to start the battle.';
+					: invalidInputs.length === 1
+						? 'Please use a valid GitHub username to start the battle.'
+						: 'Please use valid GitHub usernames to start the battle.';
 				errorElement.dataset.validationMode = 'client';
 				return invalidInputs;
 			};
-			if (battleError instanceof HTMLElement) {
-				const firstInvalidInput = getFirstInvalidInput();
-				if (firstInvalidInput instanceof HTMLElement) {
-					focusFirstInvalidInput();
-				} else {
-					requestAnimationFrame(() => battleError.focus());
-				}
-			}
 
 			if (battleForm instanceof HTMLFormElement) {
 				battleForm.addEventListener(
