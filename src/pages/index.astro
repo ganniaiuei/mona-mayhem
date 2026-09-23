@@ -8,8 +8,8 @@ const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
 const player1Valid = isValidGitHubUsername(player1FromQuery);
 const player2Valid = isValidGitHubUsername(player2FromQuery);
 const hasValidPair = player1Valid && player2Valid;
-const player1InvalidQuery = hasAnyQueryPlayers && !player1Valid;
-const player2InvalidQuery = hasAnyQueryPlayers && !player2Valid;
+const player1InvalidQuery = hasAnyQueryPlayers && player1FromQuery.length > 0 && !player1Valid;
+const player2InvalidQuery = hasAnyQueryPlayers && player2FromQuery.length > 0 && !player2Valid;
 const hasInvalidQuery = hasAnyQueryPlayers && !hasValidPair;
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
 const battleErrorMessage = hasInvalidQuery
@@ -259,7 +259,7 @@ const battleErrorMessage = hasInvalidQuery
 			</form>
 			{
 				battleErrorMessage && (
-					<p id="battle-error" class="subtitle" role="alert" tabindex="-1">
+					<p id="battle-error" class="subtitle" role="alert">
 						{battleErrorMessage}
 					</p>
 				)
