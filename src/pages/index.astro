@@ -15,7 +15,7 @@ const player2MissingQuery = hasBattleQuery && !hasPlayer2Query;
 const player1InvalidQuery = player1MissingQuery || (hasPlayer1Query && (player1FromQuery.length === 0 || !player1Valid));
 const player2InvalidQuery = player2MissingQuery || (hasPlayer2Query && (player2FromQuery.length === 0 || !player2Valid));
 const hasInvalidQuery = hasBattleQuery && !hasValidPair;
-const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
+const battleMessage = hasValidPair ? 'Battle mode armed! Ready to compare both players.' : '';
 const battleErrorMessage = hasInvalidQuery
 	? player1FromQuery.length === 0 || player2FromQuery.length === 0
 		? 'Enter both usernames to start the battle.'
@@ -338,7 +338,9 @@ const battleErrorMessage = hasInvalidQuery
 					return invalidInputs;
 				}
 
-				errorElement.textContent = invalidInputs.some((input) => input.validity.valueMissing)
+				errorElement.textContent = invalidInputs.some(
+					(input) => input.validity.valueMissing || input.value.trim().length === 0
+				)
 					? 'Enter both usernames to start the battle.'
 					: 'Please use valid GitHub usernames to start the battle.';
 				errorElement.dataset.validationMode = 'client';
