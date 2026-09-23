@@ -166,6 +166,10 @@
 					grid-column: auto;
 					justify-self: center;
 				}
+
+				.vs {
+					display: none;
+				}
 			}
 		</style>
 	</head>
@@ -178,17 +182,36 @@
 			</div>
 			<h1>Contribution Battle Arena</h1>
 			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
-			<div class="battle-form" role="group" aria-label="Battle player selection">
+			<form class="battle-form" aria-label="Battle player selection">
 				<label class="sr-only" for="player1">Player 1 GitHub username</label>
 				<input id="player1" class="player-input" type="text" placeholder="Player 1 GitHub Username" />
 				<span class="vs" aria-hidden="true">VS</span>
 				<label class="sr-only" for="player2">Player 2 GitHub username</label>
 				<input id="player2" class="player-input" type="text" placeholder="Player 2 GitHub Username" />
-				<button id="battle-button" type="button">Start Battle</button>
-			</div>
+				<button id="battle-button" type="submit">Start Battle</button>
+			</form>
+			<p id="battle-status" class="subtitle" aria-live="polite"></p>
 		</main>
 		<script>
 			const toggleButton = document.querySelector<HTMLButtonElement>('#theme-toggle');
+			const battleForm = document.querySelector<HTMLFormElement>('.battle-form');
+			const player1Input = document.querySelector<HTMLInputElement>('#player1');
+			const player2Input = document.querySelector<HTMLInputElement>('#player2');
+			const battleStatus = document.querySelector<HTMLParagraphElement>('#battle-status');
+
+			battleForm?.addEventListener('submit', (event) => {
+				event.preventDefault();
+				const player1 = player1Input?.value.trim() ?? '';
+				const player2 = player2Input?.value.trim() ?? '';
+				if (!battleStatus) return;
+
+				if (!player1 || !player2) {
+					battleStatus.textContent = 'Enter both usernames to begin the battle.';
+					return;
+				}
+
+				battleStatus.textContent = `Battle mode armed: ${player1} vs ${player2}!`;
+			});
 
 			if (toggleButton) {
 				const themeAttribute = 'data-theme';
