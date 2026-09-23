@@ -26,6 +26,12 @@
 				--accent-primary: #5fed83;
 				--accent-secondary: #8a2be2;
 				--border-glow: rgba(95, 237, 131, 0.55);
+				--accent-primary-soft: rgba(95, 237, 131, 0.35);
+				--accent-secondary-soft: rgba(138, 43, 226, 0.5);
+				--accent-primary-surface: rgba(95, 237, 131, 0.22);
+				--focus-outline: rgba(255, 143, 214, 0.9);
+				--button-start: rgba(138, 43, 226, 0.72);
+				--button-end: rgba(95, 237, 131, 0.72);
 				--shadow: rgba(0, 0, 0, 0.45);
 			}
 
@@ -33,6 +39,12 @@
 				--accent-primary: #00f5ff;
 				--accent-secondary: #ff6b35;
 				--border-glow: rgba(0, 245, 255, 0.5);
+				--accent-primary-soft: rgba(0, 245, 255, 0.35);
+				--accent-secondary-soft: rgba(255, 107, 53, 0.5);
+				--accent-primary-surface: rgba(0, 245, 255, 0.22);
+				--focus-outline: rgba(255, 198, 168, 0.95);
+				--button-start: rgba(255, 107, 53, 0.72);
+				--button-end: rgba(0, 245, 255, 0.72);
 			}
 
 			* {
@@ -44,7 +56,7 @@
 				min-height: 100vh;
 				font-family: 'Press Start 2P', 'Courier New', monospace;
 				background:
-					radial-gradient(circle at 20% 10%, color-mix(in srgb, var(--accent-secondary) 25%, transparent), transparent 40%),
+					radial-gradient(circle at 20% 10%, var(--accent-secondary-soft), transparent 40%),
 					linear-gradient(180deg, #080812 0%, var(--bg) 70%);
 				color: var(--text);
 				display: grid;
@@ -67,15 +79,15 @@
 				letter-spacing: 0.12em;
 				color: var(--accent-primary);
 				text-shadow:
-					0 0 8px color-mix(in srgb, var(--accent-primary) 70%, #fff),
-					0 0 18px color-mix(in srgb, var(--accent-secondary) 45%, transparent);
+					0 0 8px rgba(255, 255, 255, 0.8),
+					0 0 18px var(--accent-secondary-soft);
 			}
 
 			.subtitle {
 				margin: 12px 0 24px;
 				font-size: 0.72rem;
 				line-height: 1.7;
-				color: color-mix(in srgb, var(--text) 85%, var(--accent-primary));
+				color: #d5fff4;
 			}
 
 			.controls {
@@ -99,10 +111,10 @@
 			#theme-toggle:hover,
 			#theme-toggle:focus-visible {
 				color: var(--text);
-				background: color-mix(in srgb, var(--accent-primary) 22%, #0b0b19);
-				outline: 2px solid color-mix(in srgb, var(--accent-secondary) 65%, #fff);
+				background: var(--accent-primary-surface);
+				outline: 2px solid var(--focus-outline);
 				outline-offset: 2px;
-				box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 40%, transparent);
+				box-shadow: 0 0 0 3px var(--accent-primary-soft);
 			}
 
 			.battle-form {
@@ -128,7 +140,7 @@
 			}
 
 			.player-input::placeholder {
-				color: color-mix(in srgb, var(--text) 70%, transparent);
+				color: rgba(247, 247, 255, 0.7);
 			}
 
 			.sr-only {
@@ -146,7 +158,7 @@
 			.vs {
 				color: var(--accent-secondary);
 				font-size: 0.8rem;
-				text-shadow: 0 0 10px color-mix(in srgb, var(--accent-secondary) 80%, #fff);
+				text-shadow: 0 0 10px var(--accent-secondary-soft);
 			}
 
 			#battle-button {
@@ -154,8 +166,8 @@
 				cursor: pointer;
 				background: linear-gradient(
 					90deg,
-					color-mix(in srgb, var(--accent-secondary) 65%, #111),
-					color-mix(in srgb, var(--accent-primary) 65%, #111)
+					var(--button-start),
+					var(--button-end)
 				);
 			}
 
@@ -187,10 +199,10 @@
 			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
 			<form class="battle-form" aria-label="Battle player selection">
 				<label class="sr-only" for="player1">Player 1 GitHub username</label>
-				<input id="player1" class="player-input" type="text" placeholder="Player 1 GitHub Username" />
+				<input id="player1" class="player-input" type="text" placeholder="Player 1 GitHub Username" required />
 				<span class="vs" aria-hidden="true">VS</span>
 				<label class="sr-only" for="player2">Player 2 GitHub username</label>
-				<input id="player2" class="player-input" type="text" placeholder="Player 2 GitHub Username" />
+				<input id="player2" class="player-input" type="text" placeholder="Player 2 GitHub Username" required />
 				<button id="battle-button" type="submit">Start Battle</button>
 			</form>
 			<p id="battle-status" class="subtitle" aria-live="polite"></p>
