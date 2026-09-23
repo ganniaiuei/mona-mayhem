@@ -280,13 +280,6 @@ const battleErrorMessage = hasInvalidQuery
 					: [];
 			let battleError = document.querySelector('#battle-error');
 			const battleErrorId = 'battle-error';
-			const getFirstInvalidInput = () => document.querySelector('.player-input[aria-invalid="true"]');
-			const focusFirstInvalidInput = () => {
-				const firstInvalidInput = getFirstInvalidInput();
-				if (firstInvalidInput instanceof HTMLElement) {
-					requestAnimationFrame(() => firstInvalidInput.focus());
-				}
-			};
 			const setInputErrorState = (input, isInvalid) => {
 				if (isInvalid) {
 					input.setAttribute('aria-invalid', 'true');
