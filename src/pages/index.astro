@@ -9,6 +9,15 @@
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Mona Mayhem</title>
+		<script is:inline>
+			try {
+				if (localStorage.getItem('mona-theme') === 'blue-orange') {
+					document.documentElement.setAttribute('data-theme', 'blue-orange');
+				}
+			} catch {
+				// Ignore storage access errors.
+			}
+		</script>
 		<style>
 			:root {
 				--bg: #05050d;
@@ -20,7 +29,7 @@
 				--shadow: rgba(0, 0, 0, 0.45);
 			}
 
-			body[data-theme='blue-orange'] {
+			:root[data-theme='blue-orange'] {
 				--accent-primary: #00f5ff;
 				--accent-secondary: #ff6b35;
 				--border-glow: rgba(0, 245, 255, 0.5);
@@ -149,7 +158,9 @@
 	<body>
 		<main class="arena">
 			<div class="controls">
-				<button id="theme-toggle" type="button" aria-pressed="false">Switch to Blue/Orange</button>
+				<button id="theme-toggle" type="button" aria-pressed="false" aria-label="Theme toggle: Classic Retro active">
+					Switch to Blue/Orange
+				</button>
 			</div>
 			<h1>Contribution Battle Arena</h1>
 			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
@@ -167,27 +178,36 @@
 				const alternateTheme = 'blue-orange';
 				const storageKey = 'mona-theme';
 				const savedTheme = localStorage.getItem(storageKey);
+				const root = document.documentElement;
 
-				if (savedTheme === alternateTheme) {
-					document.body.setAttribute(themeAttribute, alternateTheme);
-					toggleButton.textContent = 'Switch to Classic Theme';
-					toggleButton.setAttribute('aria-pressed', 'true');
+				const syncToggleState = (usingAlternate: boolean) => {
+					toggleButton.textContent = usingAlternate ? 'Switch to Classic Theme' : 'Switch to Blue/Orange';
+					toggleButton.setAttribute('aria-pressed', usingAlternate ? 'true' : 'false');
+					toggleButton.setAttribute(
+						'aria-label',
+						usingAlternate ? 'Theme toggle: Blue and Orange active' : 'Theme toggle: Classic Retro active'
+					);
+				};
+
+				if (savedTheme === alternateTheme || root.getAttribute(themeAttribute) === alternateTheme) {
+					root.setAttribute(themeAttribute, alternateTheme);
+					syncToggleState(true);
+				} else {
+					syncToggleState(false);
 				}
 
 				toggleButton.addEventListener('click', () => {
-					const usingAlternate = document.body.getAttribute(themeAttribute) === alternateTheme;
+					const usingAlternate = root.getAttribute(themeAttribute) === alternateTheme;
 					if (usingAlternate) {
-						document.body.removeAttribute(themeAttribute);
+						root.removeAttribute(themeAttribute);
 						localStorage.removeItem(storageKey);
-						toggleButton.textContent = 'Switch to Blue/Orange';
-						toggleButton.setAttribute('aria-pressed', 'false');
+						syncToggleState(false);
 						return;
 					}
 
-					document.body.setAttribute(themeAttribute, alternateTheme);
+					root.setAttribute(themeAttribute, alternateTheme);
 					localStorage.setItem(storageKey, alternateTheme);
-					toggleButton.textContent = 'Switch to Classic Theme';
-					toggleButton.setAttribute('aria-pressed', 'true');
+					syncToggleState(true);
 				});
 			}
 		</script>
