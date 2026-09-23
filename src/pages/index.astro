@@ -1,16 +1,16 @@
 ---
 const player1FromQuery = Astro.url.searchParams.get('player1')?.trim() ?? '';
 const player2FromQuery = Astro.url.searchParams.get('player2')?.trim() ?? '';
-const hasAnyQueryPlayers = player1FromQuery.length > 0 || player2FromQuery.length > 0;
-const usernamePatternSource = '^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$';
+const hasBattleQuery = Astro.url.searchParams.has('player1') || Astro.url.searchParams.has('player2');
+const usernamePatternSource = '^(?!.*--)[A-Za-z0-9](?:[A-Za-z0-9\\-]{0,37}[A-Za-z0-9])?$';
 const usernamePattern = new RegExp(usernamePatternSource);
 const isValidGitHubUsername = (value: string) => usernamePattern.test(value);
 const player1Valid = isValidGitHubUsername(player1FromQuery);
 const player2Valid = isValidGitHubUsername(player2FromQuery);
 const hasValidPair = player1Valid && player2Valid;
-const player1InvalidQuery = hasAnyQueryPlayers && (player1FromQuery.length === 0 || !player1Valid);
-const player2InvalidQuery = hasAnyQueryPlayers && (player2FromQuery.length === 0 || !player2Valid);
-const hasInvalidQuery = hasAnyQueryPlayers && !hasValidPair;
+const player1InvalidQuery = hasBattleQuery && (player1FromQuery.length === 0 || !player1Valid);
+const player2InvalidQuery = hasBattleQuery && (player2FromQuery.length === 0 || !player2Valid);
+const hasInvalidQuery = hasBattleQuery && !hasValidPair;
 const battleMessage = hasValidPair ? `Battle mode armed: ${player1FromQuery} vs ${player2FromQuery}!` : '';
 const battleErrorMessage = hasInvalidQuery
 	? player1FromQuery.length === 0 || player2FromQuery.length === 0
@@ -197,7 +197,7 @@ const battleErrorMessage = hasInvalidQuery
 				);
 			}
 
-			@media (max-width: 640px) {
+			@media (max-width: 1024px) {
 				.battle-form {
 					grid-template-columns: 1fr;
 				}
@@ -223,7 +223,7 @@ const battleErrorMessage = hasInvalidQuery
 			</div>
 			<h1>Contribution Battle Arena</h1>
 			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
-			<form class="battle-form" aria-label="Battle player selection" method="get">
+			<form class="battle-form" aria-label="Battle player selection" method="get" novalidate>
 				<label class="sr-only" for="player1">Player 1 GitHub username</label>
 				<input
 					id="player1"
