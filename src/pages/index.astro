@@ -98,9 +98,11 @@
 
 			#theme-toggle:hover,
 			#theme-toggle:focus-visible {
-				outline: none;
 				color: var(--text);
 				background: color-mix(in srgb, var(--accent-primary) 22%, #0b0b19);
+				outline: 2px solid color-mix(in srgb, var(--accent-secondary) 65%, #fff);
+				outline-offset: 2px;
+				box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 40%, transparent);
 			}
 
 			.battle-form {
@@ -124,6 +126,18 @@
 
 			.player-input::placeholder {
 				color: color-mix(in srgb, var(--text) 70%, transparent);
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border: 0;
 			}
 
 			.vs {
@@ -165,9 +179,11 @@
 			<h1>Contribution Battle Arena</h1>
 			<p class="subtitle">Choose your challenger names and compare contribution power levels.</p>
 			<form class="battle-form">
-				<input class="player-input" type="text" placeholder="Player 1 GitHub Username" />
+				<label class="sr-only" for="player1">Player 1 GitHub username</label>
+				<input id="player1" class="player-input" type="text" placeholder="Player 1 GitHub Username" />
 				<span class="vs">VS</span>
-				<input class="player-input" type="text" placeholder="Player 2 GitHub Username" />
+				<label class="sr-only" for="player2">Player 2 GitHub username</label>
+				<input id="player2" class="player-input" type="text" placeholder="Player 2 GitHub Username" />
 				<button id="battle-button" type="submit">Start Battle</button>
 			</form>
 		</main>
